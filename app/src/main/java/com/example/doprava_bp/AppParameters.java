@@ -38,4 +38,3 @@ public class AppParameters implements Serializable {
         this.hatu = hatu;
     }
 }
-
