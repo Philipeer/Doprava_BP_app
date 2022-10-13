@@ -11,4 +11,6 @@ Caution: When a user pairs their device with another device using BLE, the data 
 
 For this reason, if your app captures sensitive data, you should implement app-layer security to protect the privacy of that data. Zdroj: https://developer.android.com/guide/topics/connectivity/bluetooth/ble-overview
 
+Bluetooth always transmitting. BLE only when there are some data to transmit. https://www.youtube.com/watch?v=zeN88yh7YdY&ab_channel=CrossComm%2CInc.
+
 maybe: udělat prezentaci Pítrovi
