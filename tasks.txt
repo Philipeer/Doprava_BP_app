@@ -1,0 +1,14 @@
+- naskenovat si BLE od Raspberry v AS
+	-scan zařízení
+		-udělat permissions v manifest file
+	-filtr mého ROS -> zjistit UUID
+	
+- provést komunikaci s Raspberry 
+
+
+Notes:
+Caution: When a user pairs their device with another device using BLE, the data that's communicated between the two devices is accessible to all apps on the user's device.
+
+For this reason, if your app captures sensitive data, you should implement app-layer security to protect the privacy of that data. Zdroj: https://developer.android.com/guide/topics/connectivity/bluetooth/ble-overview
+
+maybe: udělat prezentaci Pítrovi
