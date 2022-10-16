@@ -1,18 +1,21 @@
 package com.example.doprava_bp
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.widget.Button
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
-import java.net.Socket
 
 
 class MainActivity : AppCompatActivity() {
+
+
+    @SuppressLint("MissingPermission")
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -23,13 +26,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         val btnConnection = findViewById<Button>(R.id.btnConnection)
+        val btnAuth = findViewById<Button>(R.id.btnAuth)
         val tvUserKey = findViewById<TextView>(R.id.tvUserKey)
         val tvAtu = findViewById<TextView>(R.id.tvAtu)
         val tvHatu = findViewById<TextView>(R.id.tvHatu)
+        val tvUserNonce = findViewById<TextView>(R.id.tvUserNonce)
+        val tvReceiverNonce = findViewById<TextView>(R.id.tvReceiverNonce)
+        val client = Client()
 
         btnConnection.setOnClickListener {
 
-            val client = Client()
+            client.receiveParamsFromIdP()
             tvUserKey.text = client.appParameters.userKey
             tvHatu.text = client.appParameters.hatu
             tvAtu.text = client.appParameters.atu.toString()
@@ -47,6 +54,12 @@ class MainActivity : AppCompatActivity() {
             socket.close()
 
              */
+        }
+
+        btnAuth.setOnClickListener {
+            client.sendAndReceiveObject()
+            tvUserNonce.text = client.userCryptogram.nonce.toString()
+            tvReceiverNonce.text = client.receiverCryptogram.nonce.toString()
         }
     }
 }

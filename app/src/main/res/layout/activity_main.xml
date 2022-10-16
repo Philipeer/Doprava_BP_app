@@ -69,4 +69,49 @@
         android:text="TextView"
         app:layout_constraintStart_toStartOf="@+id/hatuLabel"
         app:layout_constraintTop_toBottomOf="@+id/hatuLabel" />
+
+    <Button
+        android:id="@+id/btnAuth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Zahájit autentizaci"
+        app:layout_constraintStart_toStartOf="@+id/btnConnection"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/userNonceLable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="User nonce:"
+        app:layout_constraintStart_toStartOf="@+id/btnAuth"
+        app:layout_constraintTop_toBottomOf="@+id/btnAuth" />
+
+    <TextView
+        android:id="@+id/tvUserNonce"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="TextView"
+        app:layout_constraintStart_toEndOf="@+id/userNonceLable"
+        tools:layout_editor_absoluteY="96dp" />
+
+    <TextView
+        android:id="@+id/receiverNonceLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Receiver Nonce:"
+        app:layout_constraintStart_toStartOf="@+id/userNonceLable"
+        app:layout_constraintTop_toBottomOf="@+id/userNonceLable" />
+
+    <TextView
+        android:id="@+id/tvReceiverNonce"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="TextView"
+        app:layout_constraintStart_toEndOf="@+id/receiverNonceLabel"
+        tools:layout_editor_absoluteY="123dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
