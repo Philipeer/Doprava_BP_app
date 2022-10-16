@@ -9,6 +9,12 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import java.math.BigInteger
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
 
 
 class MainActivity : AppCompatActivity() {
@@ -60,6 +66,47 @@ class MainActivity : AppCompatActivity() {
             client.sendAndReceiveObject()
             tvUserNonce.text = client.userCryptogram.nonce.toString()
             tvReceiverNonce.text = client.receiverCryptogram.nonce.toString()
+            val ukey = hash(client.appParameters.userKey + "user" + client.userCryptogram.nonce.toString() +
+                    client.receiverCryptogram.nonce.toString(),"SHA-1")
+            val plaintextString = client.appParameters.hatu + client.receiverCryptogram.idr + client.userCryptogram.nonce.toString() +
+                    client.receiverCryptogram.nonce.toString()
+            val plaintext: ByteArray = plaintextString.toByteArray()
+            //val keygen = KeyGenerator.getInstance("AES")
+           // keygen.init(256)
+            //val key: SecretKey = keygen.generateKey()
+            val cipher = Cipher.getInstance("AES/GCM")
+            cipher.init(Cipher.ENCRYPT_MODE, ukey as SecretKey)
+            val ciphertext: ByteArray = cipher.doFinal(plaintext)
+            val iv: ByteArray = cipher.iv
+        }
+    }
+
+    fun hash(input: String, hashType: String?): String? {
+        return try {
+            // getInstance() method is called with algorithm SHA-1
+            val md: MessageDigest = MessageDigest.getInstance(hashType)
+
+            // digest() method is called
+            // to calculate message digest of the input string
+            // returned as array of byte
+            val messageDigest: ByteArray = md.digest(input.toByteArray())
+
+            // Convert byte array into signum representation
+            val no = BigInteger(1, messageDigest)
+
+            // Convert message digest into hex value
+
+            // Add preceding 0s to make it 32 bit
+            /*while (hashtext.length() < 32) {
+                     hashtext = "0" + hashtext;
+                 }*/
+            //
+
+            // return the HashText
+            no.toString(16)
+        } // For specifying wrong message digest algorithms
+        catch (e: NoSuchAlgorithmException) {
+            throw RuntimeException(e)
         }
     }
 }
