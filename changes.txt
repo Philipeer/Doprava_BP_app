@@ -1,0 +1,19 @@
+    MainActivity.kt
+67            client.receiverCryptogram.hatu = client.appParameters.hatu
+82            client.sendAndReceiveObject(client.receiverCryptogram,iv,ciphertext)
+
+
+------------------------------------------------------------------------------------------
+    Cryptogram.java
+  
+    private byte[] iv;
+    public List<byte[]> cryptograms = new ArrayList<>();
+
+    public byte[] getIv() {
+        return iv;
+    }
+
+    public void setIv(byte[] iv) {
+        this.iv = iv;
+    }
+    
