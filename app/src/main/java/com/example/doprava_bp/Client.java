@@ -8,6 +8,10 @@ import java.util.Random;
 
 import com.example.doprava_bp.AppParameters;
 
+import org.jetbrains.annotations.NotNull;
+
+import javax.crypto.SecretKey;
+
 public class Client {
     private AppParameters appParameters;
     private Cryptogram userCryptogram;
@@ -63,6 +67,21 @@ public class Client {
         socket.close();
     }
 
+    public final void sendAndReceiveObject(Cryptogram userCryptogram, byte[] iv, byte[] ciphertext, int port) throws IOException, ClassNotFoundException {
+        Socket socket = new Socket("192.168.56.1", port);
+
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+
+        userCryptogram.cryptograms.add(ciphertext);
+        userCryptogram.setIv(iv);
+        objectOutputStream.writeObject(userCryptogram);
+
+
+        objectOutputStream.close();
+        socket.close();
+    }
+
     public AppParameters getAppParameters() {
         return appParameters;
     }
@@ -74,4 +93,20 @@ public class Client {
     public Cryptogram getReceiverCryptogram() {
         return receiverCryptogram;
     }
+
+    public void amIAuthenticated() throws IOException, ClassNotFoundException {
+        Socket socket = new Socket("192.168.56.1", 10004);
+        ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+        userCryptogram = (Cryptogram) objectInputStream.readObject();
+        socket.close();
+    }
+
+    /*public void encrypt(@NotNull SecretKey ukey, @NotNull byte[] plaintext) {
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        val iv = ByteArray(GCM_IV_LENGTH)
+        secureRandom.nextBytes(iv)
+        val parameterSpec = GCMParameterSpec(128, iv)
+        cipher.init(Cipher.ENCRYPT_MODE, ukey, parameterSpec)
+        var ciphertext: ByteArray = cipher.doFinal(plaintext)
+    }*/
 }

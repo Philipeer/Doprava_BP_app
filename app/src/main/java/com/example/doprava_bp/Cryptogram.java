@@ -9,7 +9,9 @@ public class Cryptogram implements Serializable {
     private int idr;
     private byte[] ATU;
     private String hatu;
-    public List<String> cryptograms = new ArrayList<>();
+    private byte[] iv;
+    private boolean authenticated;
+    public List<byte[]> cryptograms = new ArrayList<>();
 
     public int getNonce() {
         return nonce;
@@ -41,5 +43,21 @@ public class Cryptogram implements Serializable {
 
     public void setHatu(String hatu) {
         this.hatu = hatu;
+    }
+
+    public byte[] getIv() {
+        return iv;
+    }
+
+    public void setIv(byte[] iv) {
+        this.iv = iv;
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
+    }
+
+    public void setAuthenticated(boolean authenticated) {
+        this.authenticated = authenticated;
     }
 }

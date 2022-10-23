@@ -95,7 +95,7 @@
         android:layout_marginStart="8dp"
         android:text="TextView"
         app:layout_constraintStart_toEndOf="@+id/userNonceLable"
-        tools:layout_editor_absoluteY="96dp" />
+        app:layout_constraintTop_toTopOf="@+id/userNonceLable" />
 
     <TextView
         android:id="@+id/receiverNonceLabel"
@@ -113,5 +113,51 @@
         android:layout_marginStart="8dp"
         android:text="TextView"
         app:layout_constraintStart_toEndOf="@+id/receiverNonceLabel"
-        tools:layout_editor_absoluteY="123dp" />
+        app:layout_constraintTop_toTopOf="@+id/receiverNonceLabel" />
+
+    <TextView
+        android:id="@+id/idrLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="IDr:"
+        app:layout_constraintStart_toStartOf="@+id/receiverNonceLabel"
+        app:layout_constraintTop_toBottomOf="@+id/receiverNonceLabel" />
+
+    <TextView
+        android:id="@+id/authenticatedLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Authenticated:"
+        app:layout_constraintStart_toStartOf="@+id/idrLabel"
+        app:layout_constraintTop_toBottomOf="@+id/idrLabel" />
+
+    <TextView
+        android:id="@+id/tvIdr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="TextView"
+        app:layout_constraintStart_toEndOf="@+id/idrLabel"
+        app:layout_constraintTop_toTopOf="@+id/idrLabel" />
+
+    <TextView
+        android:id="@+id/tvAuthenticated"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="TextView"
+        app:layout_constraintStart_toEndOf="@+id/authenticatedLabel"
+        app:layout_constraintTop_toTopOf="@+id/authenticatedLabel" />
+
+    <Button
+        android:id="@+id/scan_button"
+        android:layout_width="199dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="16dp"
+        android:text="Zahájit scan"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/authenticatedLabel" />
 </androidx.constraintlayout.widget.ConstraintLayout>
