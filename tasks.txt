@@ -17,3 +17,12 @@ maybe: udělat prezentaci Pítrovi
 
 Otázky na Dzurendu: 	obrázky: vidím na videu -> mám si udělat vlastní, nebo vzít z videa a ocitovat?
 			proč user posílá HATu, když by mu ho mohl poslat IdP?
+
+Unless the BluetoothDevice handle was cached from a recent scan, we need to perform a BLE scan before we can connect to a BLE device. A typical BLE app connection setup flow looks like this:
+
+    Perform BLE scan with optional scan results filtering.
+    Obtain ScanResult object.
+    Call ScanResult object’s getDevice() method to obtain BluetoothDevice object.
+    Call BluetoothDevice object’s connectGatt() method to initiate a BLE connection. https://punchthrough.com/android-ble-guide/?fbclid=IwAR1l6ywO1pG0KFLHoc-yzv2b6h9KTDYa8pYr_2j9_O8TMU0BFDDkWm8jcw4
+    
+    použít SCAN_MODE_LOW_LATENCY -  is recommended if the app will only be scanning for a brief period of time, typically to find a very specific type of device.
