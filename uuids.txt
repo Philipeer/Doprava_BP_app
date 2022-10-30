@@ -1,0 +1,2 @@
+service: 18b41747-01df-44d1-bc25-187082eb76bf
+1. characteristic: bc3ba145-f588-4f86-8bc4-fb925a23dc31
