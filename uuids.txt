@@ -1,3 +1,7 @@
 service: 18b41747-01df-44d1-bc25-187082eb76bf
 1. characteristic (Nu): bc3ba145-f588-4f86-8bc4-fb925a23dc31
-2. characteristiv (Nr): c8ba0ef6-5c27-11ed-9b6a-0242ac120002
+2. characteristic (Nr): c8ba0ef6-5c27-11ed-9b6a-0242ac120002
+3. characteristic (IDr): 01e6ee2d-420a-4380-8e14-2a83844d4ae8
+4. characteristic (HATu): b828f7a3-157a-4a4e-9c9b-3feb19b8e90d
+5. characteristic (IV): 27938afb-f6f0-4e19-a4b2-2545da6bad40
+6. characterisic (C): 23cab78f-28d9-4ecb-bfd1-1bba7b486fa3
