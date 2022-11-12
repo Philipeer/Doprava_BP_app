@@ -1,48 +1,69 @@
 package com.example.doprava_bp
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothManager
 import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-import java.security.SecureRandom
-import android.Manifest
-import androidx.core.app.ActivityCompat
+import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.SecretKey
-import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
+
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
 private const val LOCATION_PERMISSION_REQUEST_CODE = 2
+private val rnd : Random = Random()
 
 class MainActivity : AppCompatActivity() {
 
-    private val secureRandom: SecureRandom = SecureRandom()
-    private val GCM_IV_LENGTH = 12
+    private var mContext: Context? = null
 
-    private val bluetoothAdapter: BluetoothAdapter by lazy {
-        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        bluetoothManager.adapter
+    fun getContext(): Context? {
+        return mContext
     }
+    val client = Client()
+   // private val secureRandom: SecureRandom = SecureRandom()
+   // private val GCM_IV_LENGTH = 12
+   //private val userCryptogram: Cryptogram = Cryptogram()
+   //private val receiverCryptogram : Cryptogram = Cryptogram()
+   // private var ukeyString = hash(client.appParameters.userKey + "user" + userCryptogram.nonce.toString() +
+   // receiverCryptogram.nonce.toString(),"SHA-1")
+   // var plaintextString = client.appParameters.hatu + receiverCryptogram.idr + userCryptogram.nonce.toString() +
+   //         receiverCryptogram.nonce.toString()
+   // var plaintext: ByteArray = plaintextString.toByteArray()
+   // val ukey: SecretKey = SecretKeySpec(ukeyString!!.toByteArray(), "AES")
 
-    val isLocationPermissionGranted
-        get() = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+
+
+
+    // Z PUNCHLINE
+
+   // private val bluetoothAdapter: BluetoothAdapter by lazy {
+   //     val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+   //     bluetoothManager.adapter
+   // }
+   //
+   // private val bleScanner by lazy {
+   //     bluetoothAdapter.bluetoothLeScanner
+   // }
+   //
+   // private val scanSettings = ScanSettings.Builder()
+   //     .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+   //     .build()
+   //
+   // val isLocationPermissionGranted
+   //     get() = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+
+    // PROMĚNNÉ Z BLESSED
 
 
 
@@ -57,9 +78,12 @@ class MainActivity : AppCompatActivity() {
             StrictMode.setThreadPolicy(policy)
         }
 
+        mContext = applicationContext
+
         val btnConnection = findViewById<Button>(R.id.btnConnection)
         val btnAuth = findViewById<Button>(R.id.btnAuth)
         val scan_button = findViewById<Button>(R.id.scan_button)
+        val btnBleCon = findViewById<Button>(R.id.btnBleCon)
         val tvUserKey = findViewById<TextView>(R.id.tvUserKey)
         val tvAtu = findViewById<TextView>(R.id.tvAtu)
         val tvHatu = findViewById<TextView>(R.id.tvHatu)
@@ -68,6 +92,7 @@ class MainActivity : AppCompatActivity() {
         val tvIdr = findViewById<TextView>(R.id.tvIdr)
         val tvAuthenticated = findViewById<TextView>(R.id.tvAuthenticated)
         val client = Client()
+        val bluetoothHandler = BluetoothHandler(applicationContext)
 
         btnConnection.setOnClickListener {
 
@@ -110,88 +135,121 @@ class MainActivity : AppCompatActivity() {
             };
             val ukey: SecretKey = SecretKeySpec(ukeyString!!.toByteArray(), "AES")
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-            val iv = ByteArray(GCM_IV_LENGTH)
-            secureRandom.nextBytes(iv)
-            val parameterSpec = GCMParameterSpec(128, iv)
-            cipher.init(Cipher.ENCRYPT_MODE, ukey, parameterSpec)
+                //val iv = ByteArray(GCM_IV_LENGTH)
+                //secureRandom.nextBytes(iv)
+                //val parameterSpec = GCMParameterSpec(128, iv)
+                //cipher.init(Cipher.ENCRYPT_MODE, ukey, parameterSpec)
             var ciphertext: ByteArray = cipher.doFinal(plaintext)
-            client.sendAndReceiveObject(client.userCryptogram,iv,ciphertext, 10003)
+                //client.sendAndReceiveObject(client.userCryptogram,iv,ciphertext, 10003)
             //C2
             client.amIAuthenticated();
             tvAuthenticated.text = client.userCryptogram.isAuthenticated.toString()
             //C3
             val command = "unlock"
             val cipherC3 = Cipher.getInstance("AES/GCM/NoPadding")
-            cipherC3.init(Cipher.ENCRYPT_MODE, ukey, parameterSpec)
+                //cipherC3.init(Cipher.ENCRYPT_MODE, ukey, parameterSpec)
             plaintext = client.appParameters.atu + command.toByteArray()
             ciphertext = cipherC3.doFinal(plaintext)
-            client.sendAndReceiveObject(client.userCryptogram,iv,ciphertext, 10005)
+                //client.sendAndReceiveObject(client.userCryptogram,iv,ciphertext, 10005)
         }
 
-        scan_button.setOnClickListener { startBleScan() }
-    }
+        //scan_button.setOnClickListener { startBleScan() }
+        btnBleCon.setOnClickListener {
+            val permissions = "android.permission.BLUETOOTH_CONNECT"
+            requestPermissions(arrayOf(permissions), ENABLE_BLUETOOTH_REQUEST_CODE)
+            bluetoothHandler.central.connectPeripheral(bluetoothHandler.peripheral,bluetoothHandler.peripheralCallback)
 
-    override fun onResume() {
-        super.onResume()
-        if (!bluetoothAdapter.isEnabled) {
-            promptEnableBluetooth()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            ENABLE_BLUETOOTH_REQUEST_CODE -> {
-                if (resultCode != Activity.RESULT_OK) {
-                    promptEnableBluetooth()
-                }
-            }
         }
     }
 
-    @SuppressLint("MissingPermission")
-    private fun promptEnableBluetooth() {
-        if (!bluetoothAdapter.isEnabled) {
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
-        }
-    }
+  // override fun onResume() {
+  //     super.onResume()
+  //     if (!bluetoothAdapter.isEnabled) {
+  //         promptEnableBluetooth()
+  //     }
+  // }
+  //
+  // override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+  //     super.onActivityResult(requestCode, resultCode, data)
+  //     when (requestCode) {
+  //         ENABLE_BLUETOOTH_REQUEST_CODE -> {
+  //             if (resultCode != Activity.RESULT_OK) {
+  //                 promptEnableBluetooth()
+  //             }
+  //         }
+  //     }
+  // }
 
-    private fun startBleScan() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !isLocationPermissionGranted) {
-            requestLocationPermission()
-        }
-        else { /* TODO: Actually perform scan */ }
-    }
+  //  override fun onRequestPermissionsResult(
+  //      requestCode: Int,
+  //      permissions: Array<out String>,
+  //      grantResults: IntArray
+  //  ) {
+  //      super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+  //      when (requestCode) {
+  //          LOCATION_PERMISSION_REQUEST_CODE -> {
+  //              if (grantResults.firstOrNull() == PackageManager.PERMISSION_DENIED) {
+  //                  requestLocationPermission()
+  //              } else {
+  //                  startBleScan()
+  //              }
+  //          }
+  //      }
+  //  }
+  //
+  //  @SuppressLint("MissingPermission")
+  //  private fun promptEnableBluetooth() {
+  //      if (!bluetoothAdapter.isEnabled) {
+  //          val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+  //          startActivityForResult(enableBtIntent, ENABLE_BLUETOOTH_REQUEST_CODE)
+  //      }
+  //  }
 
-    private fun requestLocationPermission() {
-        if (isLocationPermissionGranted) {
-            return
-        }
-        runOnUiThread { /* //TODO: Alerts dont work atm
-            alert {
-                title = "Location permission required"
-                message = "Starting from Android M (6.0), the system requires apps to be granted " +
-                        "location access in order to scan for BLE devices."
-                isCancelable = false
-                positiveButton(android.R.string.ok) {
-                    requestPermission(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        LOCATION_PERMISSION_REQUEST_CODE
-                    )
-                }
-            }.show() ***/
-        }
-    }
+   // @SuppressLint("MissingPermission")
+   // private fun startBleScan() {
+   //     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !isLocationPermissionGranted) {
+   //         requestLocationPermission()
+   //     }
+   //     else { bleScanner.startScan(null, scanSettings, scanCallback) }
+   // }
+   //
+   // private fun requestLocationPermission() {
+   //     if (isLocationPermissionGranted) {
+   //         return
+   //     }
+   //     runOnUiThread { /* //TODO: Alerts dont work atm
+   //         alert {
+   //             title = "Location permission required"
+   //             message = "Starting from Android M (6.0), the system requires apps to be granted " +
+   //                     "location access in order to scan for BLE devices."
+   //             isCancelable = false
+   //             positiveButton(android.R.string.ok) {
+   //                 requestPermission(
+   //                     Manifest.permission.ACCESS_FINE_LOCATION,
+   //                     LOCATION_PERMISSION_REQUEST_CODE
+   //                 )
+   //             }
+   //         }.show() ***/
+   //     }
+   // }
 
-    fun Context.hasPermission(permissionType: String): Boolean {
-        return ContextCompat.checkSelfPermission(this, permissionType) ==
-                PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun Activity.requestPermission(permission: String, requestCode: Int) {
-        ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
-    }
+  // private val scanCallback = object : ScanCallback() {
+  //     @SuppressLint("MissingPermission")
+  //     override fun onScanResult(callbackType: Int, result: ScanResult) {
+  //         with(result.device) {
+  //             Log.i("ScanCallback", "Found BLE device! Name: ${name ?: "Unnamed"}, address: $address")
+  //         }
+  //     }
+  // }
+  //
+  // fun Context.hasPermission(permissionType: String): Boolean {
+  //     return ContextCompat.checkSelfPermission(this, permissionType) ==
+  //             PackageManager.PERMISSION_GRANTED
+  // }
+  //
+  // private fun Activity.requestPermission(permission: String, requestCode: Int) {
+  //     ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
+  // }
 
     fun hash(input: String, hashType: String?): String? {
         return try {
@@ -221,6 +279,25 @@ class MainActivity : AppCompatActivity() {
             throw RuntimeException(e)
         }
     }
+
+    private fun intToBytes(data: Int): ByteArray? {
+        return byteArrayOf(
+            (data shr 24 and 0xff).toByte(),
+            (data shr 16 and 0xff).toByte(),
+            (data shr 8 and 0xff).toByte(),
+            (data shr 0 and 0xff).toByte()
+        )
+    }
+
+    private fun convertByteArrayToInt(data: ByteArray?): Int {
+        return if (data == null || data.size != 4) 0x0 else ( // NOTE: type cast not necessary for int
+                0xff and data[0].toInt() shl 24 or (
+                        0xff and data[1].toInt() shl 16) or (
+                        0xff and data[2].toInt() shl 8) or (
+                        0xff and data[3].toInt() shl 0))
+        // ----------
+    }
+
 
     /*
     fun scanForDevices(context : Context, handler: Handler){
