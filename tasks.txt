@@ -17,6 +17,10 @@ maybe: udělat prezentaci Pítrovi
 
 Otázky na Dzurendu: 	obrázky: vidím na videu -> mám si udělat vlastní, nebo vzít z videa a ocitovat?
 			proč user posílá HATu, když by mu ho mohl poslat IdP?
+			__________________________________________________________________________________
+			v tab. vs v Tabulce ??
+			vadí používání jednoho zdroje na více místech?
+			
 
 Unless the BluetoothDevice handle was cached from a recent scan, we need to perform a BLE scan before we can connect to a BLE device. A typical BLE app connection setup flow looks like this:
 
