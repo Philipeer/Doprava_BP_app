@@ -21,6 +21,8 @@ Otázky na Dzurendu: 	obrázky: vidím na videu -> mám si udělat vlastní, neb
 			v tab. vs v Tabulce ??
 			vadí používání jednoho zdroje na více místech?
 			u zkratek stačí záznam v seznamu zkratek?
+			kolik stran se ode mne očekává?
+			technické psaní
 			
 
 Unless the BluetoothDevice handle was cached from a recent scan, we need to perform a BLE scan before we can connect to a BLE device. A typical BLE app connection setup flow looks like this:
