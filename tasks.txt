@@ -13,16 +13,16 @@ For this reason, if your app captures sensitive data, you should implement app-l
 
 Bluetooth always transmitting. BLE only when there are some data to transmit. https://www.youtube.com/watch?v=zeN88yh7YdY&ab_channel=CrossComm%2CInc.
 
-maybe: udělat prezentaci Pítrovi
 
 Otázky na Dzurendu: 	obrázky: vidím na videu -> mám si udělat vlastní, nebo vzít z videa a ocitovat?
 			proč user posílá HATu, když by mu ho mohl poslat IdP?
 			__________________________________________________________________________________
 			v tab. vs v Tabulce ??
 			vadí používání jednoho zdroje na více místech?
-			u zkratek stačí záznam v seznamu zkratek?
+			u zkratek stačí záznam v seznamu zkratek? - závorka a zmínit
 			kolik stran se ode mne očekává?
 			technické psaní
+			můžu si vypujčit systemy a kryptografické primitiva z článku??
 			
 
 Unless the BluetoothDevice handle was cached from a recent scan, we need to perform a BLE scan before we can connect to a BLE device. A typical BLE app connection setup flow looks like this:
