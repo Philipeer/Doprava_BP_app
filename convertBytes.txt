@@ -1,0 +1,11 @@
+public byte[] convertToPositiveBytes(byte[] bytes){
+        byte[] byteArray = new byte[bytes.length];
+        for(int i=0;i<bytes.length;i++){
+            byteArray[0] = byteAbs(bytes[0]);
+        }
+        return byteArray;
+    }
+
+    byte byteAbs(byte b) {
+        return b >= 0? b : (byte) (b == -128 ? 127 : -b);
+    }
