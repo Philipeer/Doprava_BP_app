@@ -14,9 +14,6 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
-import javax.crypto.Cipher
-import javax.crypto.SecretKey
-import javax.crypto.spec.SecretKeySpec
 
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
@@ -82,7 +79,7 @@ class MainActivity : AppCompatActivity() {
 
         val btnConnection = findViewById<Button>(R.id.btnConnection)
         val btnAuth = findViewById<Button>(R.id.btnAuth)
-        val scan_button = findViewById<Button>(R.id.scan_button)
+        //val scan_button = findViewById<Button>(R.id.scan_button)
         val btnBleCon = findViewById<Button>(R.id.btnBleCon)
         val tvUserKey = findViewById<TextView>(R.id.tvUserKey)
         val tvAtu = findViewById<TextView>(R.id.tvAtu)
@@ -92,7 +89,8 @@ class MainActivity : AppCompatActivity() {
         val tvIdr = findViewById<TextView>(R.id.tvIdr)
         val tvAuthenticated = findViewById<TextView>(R.id.tvAuthenticated)
         val client = Client()
-        val bluetoothHandler = BluetoothHandler(applicationContext)
+        lateinit var bluetoothHandler: BluetoothHandler
+
 
         btnConnection.setOnClickListener {
 
@@ -117,47 +115,32 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnAuth.setOnClickListener {
-            client.sendAndReceiveObject()
-            client.userCryptogram.hatu = client.appParameters.hatu
-            tvUserNonce.text = client.userCryptogram.nonce.toString()
-            tvReceiverNonce.text = client.receiverCryptogram.nonce.toString()
-            tvIdr.text = client.receiverCryptogram.idr.toString()
-            var ukeyString = hash(client.appParameters.userKey + "user" + client.userCryptogram.nonce.toString() +
-                    client.receiverCryptogram.nonce.toString(),"SHA-1")
-            var plaintextString = client.appParameters.hatu + client.receiverCryptogram.idr + client.userCryptogram.nonce.toString() +
-                    client.receiverCryptogram.nonce.toString()
-            var plaintext: ByteArray = plaintextString.toByteArray()
-            //val keygen = KeyGenerator.getInstance("AES")
-           // keygen.init(256)
-            //val key: SecretKey = keygen.generateKey()
-            if (ukeyString != null) {
-                ukeyString = ukeyString.substring(0,16)
-            };
-            val ukey: SecretKey = SecretKeySpec(ukeyString!!.toByteArray(), "AES")
-            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-                //val iv = ByteArray(GCM_IV_LENGTH)
-                //secureRandom.nextBytes(iv)
-                //val parameterSpec = GCMParameterSpec(128, iv)
-                //cipher.init(Cipher.ENCRYPT_MODE, ukey, parameterSpec)
-            var ciphertext: ByteArray = cipher.doFinal(plaintext)
-                //client.sendAndReceiveObject(client.userCryptogram,iv,ciphertext, 10003)
-            //C2
-            client.amIAuthenticated();
-            tvAuthenticated.text = client.userCryptogram.isAuthenticated.toString()
-            //C3
-            val command = "unlock"
-            val cipherC3 = Cipher.getInstance("AES/GCM/NoPadding")
-                //cipherC3.init(Cipher.ENCRYPT_MODE, ukey, parameterSpec)
-            plaintext = client.appParameters.atu + command.toByteArray()
-            ciphertext = cipherC3.doFinal(plaintext)
-                //client.sendAndReceiveObject(client.userCryptogram,iv,ciphertext, 10005)
+            tvIdr.text = bluetoothHandler.cryptoCore.receiverCryptogram.idr.toString()
+            tvUserNonce.text = bluetoothHandler.cryptoCore.userCryptogram.nonce.toString()
+            tvReceiverNonce.text = bluetoothHandler.cryptoCore.receiverCryptogram.nonce.toString()
+            tvAuthenticated.text = bluetoothHandler.cryptoCore.userCryptogram.isAuthenticated.toString()
         }
 
         //scan_button.setOnClickListener { startBleScan() }
         btnBleCon.setOnClickListener {
-            val permissions = "android.permission.BLUETOOTH_CONNECT"
-            requestPermissions(arrayOf(permissions), ENABLE_BLUETOOTH_REQUEST_CODE)
-            bluetoothHandler.central.connectPeripheral(bluetoothHandler.peripheral,bluetoothHandler.peripheralCallback)
+            val permission1 = "android.permission.BLUETOOTH_CONNECT"
+            val permission2= "android.permission.ACCESS_FINE_LOCATION"
+            val permission21= "android.permission.ACCESS_COARSE_LOCATION"
+            val permission3= "android.permission.BLUETOOTH_SCAN"
+            val permission4 = "android.permission.BLUETOOTH_ADMIN"
+            val permission5 = "android.permission.ACCESS_BACKGROUND_LOCATION"
+            requestPermissions(arrayOf(permission1,permission2,permission3,permission4,permission21,permission5), ENABLE_BLUETOOTH_REQUEST_CODE)
+            //bluetoothHandler.central.connectPeripheral(bluetoothHandler.peripheral,bluetoothHandler.peripheralCallback)
+            val SERVICE_UUID = UUID.fromString("18b41747-01df-44d1-bc25-187082eb76bf")
+            bluetoothHandler = BluetoothHandler(applicationContext,client.appParameters)
+            bluetoothHandler.central.scanForPeripheralsWithServices(arrayOf(
+                SERVICE_UUID
+            ));
+            //bluetoothHandler.central.scanForPeripherals()
+            tvIdr.text = bluetoothHandler.receiverCryptogram.idr.toString()
+            tvUserNonce.text = bluetoothHandler.userCryptogram.nonce.toString()
+            tvReceiverNonce.text = bluetoothHandler.receiverCryptogram.nonce.toString()
+            tvAuthenticated.text = bluetoothHandler.userCryptogram.isAuthenticated.toString()
 
         }
     }

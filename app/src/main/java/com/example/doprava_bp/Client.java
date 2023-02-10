@@ -25,7 +25,15 @@ public class Client {
     }
 
     public void receiveParamsFromIdP() throws IOException, ClassNotFoundException {
-        Socket socket = new Socket("192.168.56.1", 10001);
+        //Socket socket = new Socket("192.168.56.1", 10001);
+        //Socket socket = new Socket("192.168.1.7", 10001); //BRNO
+        //Socket socket = new Socket("192.168.145.1", 10001);
+        //Socket socket = new Socket("192.168.126.1", 10001);
+        //Socket socket = new Socket("192.168.99.1", 10001);
+        //Socket socket = new Socket("10.0.0.30", 10001); //BV
+        Socket socket = new Socket("10.0.0.135", 10001); //BV
+        //Socket socket = new Socket("100.69.147.13", 10001); //vut
+        //Socket socket = new Socket("172.20.10.6", 10001); //hotspot
 
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
         ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
