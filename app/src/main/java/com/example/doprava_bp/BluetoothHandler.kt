@@ -120,7 +120,9 @@ class BluetoothHandler(val context: Context, val appParameters: AppParameters) {
                     if (cryptogramCharacteristic != null){
                         cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram)
                         peripheral.setNotify(cryptogramCharacteristic, true)
-                        peripheral.writeCharacteristic(cryptogramCharacteristic,cryptoCore.getCipherText(),WriteType.WITH_RESPONSE)
+                        val bluetoothBytesParser : BluetoothBytesParser = BluetoothBytesParser()
+                        bluetoothBytesParser.setString(cryptoCore.getCipherText())
+                        peripheral.writeCharacteristic(cryptogramCharacteristic,bluetoothBytesParser.value,WriteType.WITH_RESPONSE)
                     }
                     if (ivCharacteristic != null){
                         cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram)
@@ -142,7 +144,9 @@ class BluetoothHandler(val context: Context, val appParameters: AppParameters) {
                         //    peripheral.setNotify(cryptogramCharacteristic, true)
                         //}
                         if (cryptogramCharacteristic != null) {
-                            peripheral.writeCharacteristic(cryptogramCharacteristic,cryptoCore.getFinalCipher(),WriteType.WITH_RESPONSE)
+                            val bluetoothBytesParser : BluetoothBytesParser = BluetoothBytesParser()
+                            bluetoothBytesParser.setString(cryptoCore.getFinalCipher())
+                            peripheral.writeCharacteristic(cryptogramCharacteristic,bluetoothBytesParser.value,WriteType.WITH_RESPONSE)
                             Log.i("C2:","zapisuju")
                         }
                         cryptogramCounter = 4
@@ -164,7 +168,7 @@ class BluetoothHandler(val context: Context, val appParameters: AppParameters) {
                     Log.i("ERROR: Failed writing " + parser.getStringValue(0), "to " +  characteristic.getUuid());
                 }
                 if (characteristicUUID.equals(CRYPTOGRAM_USER_CHAR_UUID)){
-                    Log.i("cryptogram", Arrays.toString(parser.value))
+                    Log.i("cryptogram", parser.getStringValue(0))
                 }
                 if (characteristicUUID.equals(IV_USER_CHAR_UUID)){
                     Log.i("IV: ", Arrays.toString(parser.value))

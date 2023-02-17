@@ -20,7 +20,7 @@ class CryptoCore(val appParameters: AppParameters, val userCryptogram: Cryptogra
    // private var plaintextString = appParameters.hatu + receiverCryptogram.idr + userCryptogram.nonce.toString() +
    //         receiverCryptogram.nonce.toString()
 
-    fun getCipherText(): ByteArray? {
+    fun getCipherText(): String {
         val ukeyContent = appParameters.userKey + "user" + userCryptogram.nonce.toString() +
                 receiverCryptogram.nonce.toString()
         val plaintextContent = appParameters.hatu + receiverCryptogram.idr + userCryptogram.nonce.toString() +
@@ -47,15 +47,16 @@ class CryptoCore(val appParameters: AppParameters, val userCryptogram: Cryptogra
         var ciphertext: ByteArray = cipher.doFinal(plaintext)
         userCryptogram.iv = iv
         Log.i("IV: ", Arrays.toString(iv))
-        ciphertext = convertToPositiveBytes(ciphertext)
-        return ciphertext
+        //ciphertext = convertToPositiveBytes(ciphertext)
+        val ciphertextHex = ciphertext.toHex()
+        return ciphertextHex
     }
 
     fun getUserIv() : ByteArray{
         return userCryptogram.iv
     }
 
-    fun getFinalCipher(): ByteArray{
+    fun getFinalCipher(): String {
         var ukeyString = hash(appParameters.userKey + "user" + userCryptogram.nonce.toString() +
                 receiverCryptogram.nonce.toString(), "SHA-1")
         if (ukeyString != null) {
@@ -69,8 +70,12 @@ class CryptoCore(val appParameters: AppParameters, val userCryptogram: Cryptogra
         val plaintext = appParameters.atu + command.toByteArray()
         var ciphertext = cipherC3.doFinal(plaintext)
         //Log.i("getFinalCipher:", Arrays.toString(ciphertext))
-        ciphertext = convertToPositiveBytes(ciphertext)
-        return plaintext
+        //ciphertext = convertToPositiveBytes(ciphertext)
+        Log.i("IV array: ", Arrays.toString(getUserIv()))
+        Log.i("ukey array: ", Arrays.toString(ukey.encoded))
+        Log.i("C2 array: ", Arrays.toString(ciphertext))
+        val ciphertextHex = ciphertext.toHex()
+        return ciphertextHex
         //return ciphertext //Tohle lze vracet až bude vyřešen problém s přenášení negativních bajtů
     }
 
@@ -119,4 +124,6 @@ class CryptoCore(val appParameters: AppParameters, val userCryptogram: Cryptogra
             b
         } else b
     }
+
+    fun ByteArray.toHex(): String = joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 }

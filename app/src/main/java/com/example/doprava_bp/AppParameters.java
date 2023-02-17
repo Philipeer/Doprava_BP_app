@@ -7,6 +7,7 @@ public class AppParameters implements Serializable {
     private String userKey;
     private byte[] ATU;
     private String hatu;
+    private int keyLengths;
 
     public AppParameters() {
     }
@@ -36,5 +37,13 @@ public class AppParameters implements Serializable {
 
     public void setHatu(String hatu) {
         this.hatu = hatu;
+    }
+
+    public int getKeyLengths() {
+        return keyLengths;
+    }
+
+    public void setKeyLengths(int keyLengths) {
+        this.keyLengths = keyLengths;
     }
 }

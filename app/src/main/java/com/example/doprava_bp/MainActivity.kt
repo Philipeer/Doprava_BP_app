@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
+import android.util.Base64
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -19,10 +20,12 @@ import java.util.*
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
 private const val LOCATION_PERMISSION_REQUEST_CODE = 2
 private val rnd : Random = Random()
+const val PREFS_NAME = "MyPrefsFile"
 
 class MainActivity : AppCompatActivity() {
 
     private var mContext: Context? = null
+
 
     fun getContext(): Context? {
         return mContext
@@ -76,6 +79,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         mContext = applicationContext
+        val sharedPreferences = getSharedPreferences("AppParameters", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val appParameters = AppParameters()
 
         val btnConnection = findViewById<Button>(R.id.btnConnection)
         val btnAuth = findViewById<Button>(R.id.btnAuth)
@@ -91,13 +97,23 @@ class MainActivity : AppCompatActivity() {
         val client = Client()
         lateinit var bluetoothHandler: BluetoothHandler
 
+        tvUserKey.text = sharedPreferences.getString("userKey",null)
+        tvHatu.text = sharedPreferences.getString("hatu",null)
+        tvAtu.text = sharedPreferences.getString("atu",null)
+        appParameters.userKey = sharedPreferences.getString("userKey",null)
+        appParameters.hatu = sharedPreferences.getString("hatu",null)
+        appParameters.atu = Base64.decode(sharedPreferences.getString("ATU", null), Base64.DEFAULT)
 
         btnConnection.setOnClickListener {
 
             client.receiveParamsFromIdP()
-            tvUserKey.text = client.appParameters.userKey
-            tvHatu.text = client.appParameters.hatu
-            tvAtu.text = client.appParameters.atu.toString()
+            editor.putString("userKey", client.appParameters.userKey)
+            editor.putString("hatu", client.appParameters.hatu)
+            editor.putString("ATU", Base64.encodeToString(client.appParameters.atu, Base64.DEFAULT))
+            editor.apply()
+            tvUserKey.text = sharedPreferences.getString("userKey",null)
+            tvHatu.text = sharedPreferences.getString("hatu",null)
+            tvAtu.text = sharedPreferences.getString("atu",null)
             /*
             val socket = Socket("192.168.56.1", 10001)
             val objectOutputStream = ObjectOutputStream(socket.getOutputStream())
@@ -132,7 +148,7 @@ class MainActivity : AppCompatActivity() {
             requestPermissions(arrayOf(permission1,permission2,permission3,permission4,permission21,permission5), ENABLE_BLUETOOTH_REQUEST_CODE)
             //bluetoothHandler.central.connectPeripheral(bluetoothHandler.peripheral,bluetoothHandler.peripheralCallback)
             val SERVICE_UUID = UUID.fromString("18b41747-01df-44d1-bc25-187082eb76bf")
-            bluetoothHandler = BluetoothHandler(applicationContext,client.appParameters)
+            bluetoothHandler = BluetoothHandler(applicationContext,appParameters)
             bluetoothHandler.central.scanForPeripheralsWithServices(arrayOf(
                 SERVICE_UUID
             ));
