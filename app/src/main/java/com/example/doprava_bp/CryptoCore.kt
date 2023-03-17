@@ -26,14 +26,28 @@ class CryptoCore(val appParameters: AppParameters, val userCryptogram: Cryptogra
         val plaintextContent = appParameters.hatu + receiverCryptogram.idr + userCryptogram.nonce.toString() +
                 receiverCryptogram.nonce.toString()
         Log.i(ukeyContent,plaintextContent)
-        var ukeyString = hash(appParameters.userKey + "user" + userCryptogram.nonce.toString() +
-                receiverCryptogram.nonce.toString(), "SHA-1")
+        var hashType:String = "SHA-1"
+        if (appParameters.keyLengths == 128){
+            hashType = "SHA-1"
+        }
+        else if (appParameters.keyLengths == 192){
+            hashType = "SHA-224"
+        }
+        else if (appParameters.keyLengths == 256){
+            hashType = "SHA-256"
+        }
+        val userKey = appParameters.userKey.substring(0,(appParameters.keyLengths/8))
+        var ukeyString = hash(userKey + "user" + userCryptogram.nonce.toString() +
+                receiverCryptogram.nonce.toString(), hashType)
         var plaintextString = appParameters.hatu + receiverCryptogram.idr + userCryptogram.nonce.toString() +
                 receiverCryptogram.nonce.toString()
         var plaintext: ByteArray = plaintextString.toByteArray()
         Log.i("Plaintext: ", Arrays.toString(plaintext))
         if (ukeyString != null) {
-            ukeyString = ukeyString!!.substring(0,16)
+            ukeyString = ukeyString!!.substring(0,(appParameters.keyLengths/8))
+        }
+        if (ukeyString != null) {
+            Log.i("ukeyString:",ukeyString)
         }
         val ukey: SecretKey = SecretKeySpec(ukeyString!!.toByteArray(), "AES")
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
@@ -56,11 +70,30 @@ class CryptoCore(val appParameters: AppParameters, val userCryptogram: Cryptogra
         return userCryptogram.iv
     }
 
+    fun setUserIv(){
+        var iv = ByteArray(GCM_IV_LENGTH)
+        val secureRandom = SecureRandom()
+        secureRandom.nextBytes(iv)
+        iv = convertToPositiveBytes(iv)
+        userCryptogram.iv = iv
+    }
+
     fun getFinalCipher(): String {
-        var ukeyString = hash(appParameters.userKey + "user" + userCryptogram.nonce.toString() +
-                receiverCryptogram.nonce.toString(), "SHA-1")
+        var hashType:String = "SHA-1"
+        if (appParameters.keyLengths == 128){
+            hashType = "SHA-1"
+        }
+        else if (appParameters.keyLengths == 192){
+            hashType = "SHA-224"
+        }
+        else if (appParameters.keyLengths == 256){
+            hashType = "SHA-256"
+        }
+        val userKey = appParameters.userKey.substring(0,(appParameters.keyLengths/8))
+        var ukeyString = hash(userKey + "user" + userCryptogram.nonce.toString() +
+                receiverCryptogram.nonce.toString(), hashType)
         if (ukeyString != null) {
-            ukeyString = ukeyString!!.substring(0,16)
+            ukeyString = ukeyString!!.substring(0,(appParameters.keyLengths/8))
         }
         val command = "unlock"
         val ukey: SecretKey = SecretKeySpec(ukeyString!!.toByteArray(), "AES")

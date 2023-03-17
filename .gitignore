@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+convertBytes.txt
+changes.txt
+tasks.txt
+

@@ -10,12 +10,12 @@
         android:id="@+id/btnConnection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="200dp"
+        android:layout_marginTop="16dp"
         android:text="Zahájit komunikaci"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switchLock" />
 
     <TextView
         android:id="@+id/userKeyLabel"
@@ -58,7 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="44dp"
-        android:text="ATU:"
+        android:text="Key Length:"
         app:layout_constraintStart_toStartOf="@+id/userKeyLabel"
         app:layout_constraintTop_toBottomOf="@+id/userKeyLabel" />
 
@@ -117,31 +117,13 @@
         app:layout_constraintTop_toTopOf="@+id/receiverNonceLabel" />
 
     <TextView
-        android:id="@+id/idrLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="IDr:"
-        app:layout_constraintStart_toStartOf="@+id/receiverNonceLabel"
-        app:layout_constraintTop_toBottomOf="@+id/receiverNonceLabel" />
-
-    <TextView
         android:id="@+id/authenticatedLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Authenticated:"
-        app:layout_constraintStart_toStartOf="@+id/idrLabel"
-        app:layout_constraintTop_toBottomOf="@+id/idrLabel" />
-
-    <TextView
-        android:id="@+id/tvIdr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="TextView"
-        app:layout_constraintStart_toEndOf="@+id/idrLabel"
-        app:layout_constraintTop_toTopOf="@+id/idrLabel" />
+        app:layout_constraintStart_toStartOf="@+id/receiverNonceLabel"
+        app:layout_constraintTop_toBottomOf="@+id/receiverNonceLabel" />
 
     <TextView
         android:id="@+id/tvAuthenticated"
@@ -156,13 +138,65 @@
         android:id="@+id/btnBleCon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="144dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginTop="8dp"
         android:text="Připojit se BLE"
-        app:layout_constraintBottom_toTopOf="@+id/btnConnection"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/btnAuth"
-        app:layout_constraintTop_toBottomOf="@+id/authenticatedLabel" />
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+
+
+    <Switch
+        android:id="@+id/switchLock"
+        android:layout_width="106dp"
+        android:layout_height="34dp"
+        android:layout_marginTop="8dp"
+        android:text="Lock"
+        android:textOff="UNLOCK"
+        android:textOn="LOCK"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBleCon" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="Button"
+        app:layout_constraintStart_toEndOf="@+id/btnBleCon"
+        app:layout_constraintTop_toTopOf="@+id/btnBleCon" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="242dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="@+id/authenticatedLabel"
+        app:layout_constraintTop_toBottomOf="@+id/authenticatedLabel">
+
+        <RadioButton
+            android:id="@+id/radioBLE"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="BLE" />
+
+        <RadioButton
+            android:id="@+id/radioWifi"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="WiFi" />
+
+        <RadioButton
+            android:id="@+id/radioNFC"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="NFC" />
+
+    </RadioGroup>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

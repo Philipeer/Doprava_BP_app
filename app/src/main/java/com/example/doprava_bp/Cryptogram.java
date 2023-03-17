@@ -11,7 +11,7 @@ public class Cryptogram implements Serializable {
     private String hatu;
     private byte[] iv;
     private boolean authenticated;
-    public List<byte[]> cryptograms = new ArrayList<>();
+    public List<String> cryptograms = new ArrayList<>();
 
     public int getNonce() {
         return nonce;
