@@ -2,16 +2,14 @@ package com.example.doprava_bp
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.util.Base64
 import android.util.Log
-import android.widget.Button
-import android.widget.RadioGroup
-import android.widget.Switch
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import java.io.ObjectInputStream
@@ -28,9 +26,10 @@ private const val LOCATION_PERMISSION_REQUEST_CODE = 2
 private val rnd : Random = Random()
 const val PREFS_NAME = "MyPrefsFile"
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
 
     private var mContext: Context? = null
+    private lateinit var mNfcHandler: NfcHandler
 
 
     fun getContext(): Context? {
@@ -85,11 +84,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         mContext = applicationContext
+        mNfcHandler = NfcHandler(this)
         val sharedPreferences = getSharedPreferences("AppParameters", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         val appParameters = AppParameters()
 
         val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
+        val checkedId = radioGroup.checkedRadioButtonId
         val btnConnection = findViewById<Button>(R.id.btnConnection)
         val btnAuth = findViewById<Button>(R.id.btnAuth)
         val button = findViewById<Button>(R.id.button)
@@ -103,6 +104,7 @@ class MainActivity : AppCompatActivity() {
         val tvIdr = findViewById<TextView>(R.id.tvIdr)
         val tvAuthenticated = findViewById<TextView>(R.id.tvAuthenticated)
         val switchLock = findViewById<Switch>(R.id.switchLock) //check -> isChecked()
+        var lockStatus = "unlock" // Initial value when Switch is not activated
         val client = Client()
         //lateinit var bluetoothHandler: BluetoothHandler
         lateinit var bluetoothHandler: BluetoothHandlerV2
@@ -190,42 +192,119 @@ class MainActivity : AppCompatActivity() {
         //scan_button.setOnClickListener { startBleScan() }
         btnBleCon.setOnClickListener {
 
+            switchLock.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    lockStatus = "lock"
+                } else {
+                    lockStatus = "unlock"
+                }
+            }
+
+            if (checkedId != -1) {
+                val checkedRadioButton = findViewById<RadioButton>(checkedId)
+                when (checkedRadioButton) {
+                    findViewById<RadioButton>(R.id.radioBLE) -> {
+                        val permission1 = "android.permission.BLUETOOTH_CONNECT"
+                        val permission2= "android.permission.ACCESS_FINE_LOCATION"
+                        val permission21= "android.permission.ACCESS_COARSE_LOCATION"
+                        val permission3= "android.permission.BLUETOOTH_SCAN"
+                        val permission4 = "android.permission.BLUETOOTH_ADMIN"
+                        val permission5 = "android.permission.ACCESS_BACKGROUND_LOCATION"
+                        requestPermissions(arrayOf(permission1,permission2,permission3,permission4,permission21,permission5), ENABLE_BLUETOOTH_REQUEST_CODE)
+                        //bluetoothHandler.central.connectPeripheral(bluetoothHandler.peripheral,bluetoothHandler.peripheralCallback)
+                        val SERVICE_UUID = UUID.fromString("18b41747-01df-44d1-bc25-187082eb76bf")
+                        bluetoothHandler = BluetoothHandlerV2(applicationContext,appParameters) //ZDE PŘIDĚLAT SWITCHSTATUS
+                        bluetoothHandler.central.scanForPeripheralsWithServices(arrayOf(
+                            SERVICE_UUID
+                        ));
+                        /*bluetoothHandler = BluetoothHandler(applicationContext,appParameters)
+                        bluetoothHandler.central.scanForPeripheralsWithServices(arrayOf(
+                            SERVICE_UUID
+                        ));*/
+                        //bluetoothHandler.central.scanForPeripherals()
+                        //tvIdr.text = bluetoothHandler.receiverCryptogram.idr.toString()
+                        tvUserNonce.text = bluetoothHandler.userCryptogram.nonce.toString()
+                        tvReceiverNonce.text = bluetoothHandler.receiverCryptogram.nonce.toString()
+                        tvAuthenticated.text = bluetoothHandler.userCryptogram.isAuthenticated.toString()
+                    }
+                    findViewById<RadioButton>(R.id.radioWifi) -> {
+                        //TCP case
+                        val nu = rnd.nextInt()
+                        var userCryptogram = Cryptogram()
+                        var receiverCryptogram = Cryptogram()
+                        userCryptogram.nonce = nu
+                        userCryptogram.hatu = appParameters.hatu
+
+                        //výměna nonces
+                        var socket = Socket("10.0.0.72", 10001)
+                        var objectOutputStream = ObjectOutputStream(socket.getOutputStream())
+                        var objectInputStream = ObjectInputStream(socket.getInputStream())
+                        objectOutputStream.writeObject(userCryptogram)
+                        receiverCryptogram = objectInputStream.readObject() as Cryptogram
+                        objectOutputStream.close() //??
+                        socket.close()
+
+                        //vypocitani ciphertextu a jeho poslání
+                        val cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram)
+                        cryptoCore.setUserIv()
+                        userCryptogram.cryptograms.add(cryptoCore.getFinalCipher())
+                        socket = Socket("10.0.0.72", 10001)
+                        objectOutputStream = ObjectOutputStream(socket.getOutputStream())
+                        objectOutputStream.writeObject(userCryptogram)
+                        objectOutputStream.close() //??
+                        socket.close()
+
+                        //TODO: PŘIJMUTÍ VÝSLEDKU AUTENTIZACE
+                        socket = Socket("10.0.0.72", 10002)
+                        objectOutputStream = ObjectOutputStream(socket.getOutputStream())
+                        objectInputStream = ObjectInputStream(socket.getInputStream())
+                        objectOutputStream.writeObject(userCryptogram)
+                        receiverCryptogram = objectInputStream.readObject() as Cryptogram
+                        Log.i("TCP Auth:",receiverCryptogram.isAuthenticated.toString())
+                        socket.close()
+                    }
+                    findViewById<RadioButton>(R.id.radioNFC) -> {
+                        // Handle the case when the "NFC" radio button is selected
+                        // Perform the appropriate action here
+                    }
+                    else -> {
+                        // Handle other cases when a RadioButton other than "BLE", "WiFi", or "NFC" is selected
+                        // Perform the appropriate action here
+                    }
+                }
+            } else {
+                // No RadioButton is checked
+            }
 
 
-            val permission1 = "android.permission.BLUETOOTH_CONNECT"
-            val permission2= "android.permission.ACCESS_FINE_LOCATION"
-            val permission21= "android.permission.ACCESS_COARSE_LOCATION"
-            val permission3= "android.permission.BLUETOOTH_SCAN"
-            val permission4 = "android.permission.BLUETOOTH_ADMIN"
-            val permission5 = "android.permission.ACCESS_BACKGROUND_LOCATION"
-            requestPermissions(arrayOf(permission1,permission2,permission3,permission4,permission21,permission5), ENABLE_BLUETOOTH_REQUEST_CODE)
-            //bluetoothHandler.central.connectPeripheral(bluetoothHandler.peripheral,bluetoothHandler.peripheralCallback)
-            val SERVICE_UUID = UUID.fromString("18b41747-01df-44d1-bc25-187082eb76bf")
-            bluetoothHandler = BluetoothHandlerV2(applicationContext,appParameters)
-            bluetoothHandler.central.scanForPeripheralsWithServices(arrayOf(
-                SERVICE_UUID
-            ));
-            /*bluetoothHandler = BluetoothHandler(applicationContext,appParameters)
-            bluetoothHandler.central.scanForPeripheralsWithServices(arrayOf(
-                SERVICE_UUID
-            ));*/
-            //bluetoothHandler.central.scanForPeripherals()
-            //tvIdr.text = bluetoothHandler.receiverCryptogram.idr.toString()
-            tvUserNonce.text = bluetoothHandler.userCryptogram.nonce.toString()
-            tvReceiverNonce.text = bluetoothHandler.receiverCryptogram.nonce.toString()
-            tvAuthenticated.text = bluetoothHandler.userCryptogram.isAuthenticated.toString()
 
 
 
         }
     }
 
-  // override fun onResume() {
-  //     super.onResume()
-  //     if (!bluetoothAdapter.isEnabled) {
-  //         promptEnableBluetooth()
-  //     }
-  // }
+   override fun onResume() {
+       super.onResume()
+       mNfcHandler.enableForegroundDispatch()
+   }
+
+    override fun onPause() {
+        super.onPause()
+        mNfcHandler.disableForegroundDispatch()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        mNfcHandler.handleIntent(intent, this)
+    }
+
+    override fun onNfcRead(message: String) {
+        Log.i("přečtená data NFC:",message)
+    }
+
+    override fun onNfcWrite(message: String) {
+        Log.i("zapsaná data NFC:",message)
+    }
   //
   // override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
   //     super.onActivityResult(requestCode, resultCode, data)
