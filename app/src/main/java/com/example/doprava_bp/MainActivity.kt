@@ -3,9 +3,10 @@ package com.example.doprava_bp
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.os.Build
-import android.os.Bundle
-import android.os.StrictMode
+import android.nfc.NfcAdapter
+import android.nfc.Tag
+import android.nfc.tech.IsoDep
+import android.os.*
 import android.os.StrictMode.ThreadPolicy
 import android.util.Base64
 import android.util.Log
@@ -30,6 +31,20 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
 
     private var mContext: Context? = null
     private lateinit var mNfcHandler: NfcHandler
+    private val handler = Handler(Handler.Callback { message ->
+        // Get the response message from the service
+        val response = message.obj as? ByteArray ?: return@Callback false
+
+        // Update the UI to display the response
+        Log.i("handler obj. response:",response.toHex())
+
+        true
+    })
+
+    companion object {
+        private const val EXTRA_MESSENGER = "com.example.myapp.EXTRA_MESSENGER"
+    }
+
 
 
     fun getContext(): Context? {
@@ -77,6 +92,9 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val serviceIntent = Intent(this, MyHCEService::class.java)
+        startService(serviceIntent)
 
         if (Build.VERSION.SDK_INT > 9) {
             val policy = ThreadPolicy.Builder().permitAll().build()
@@ -295,7 +313,29 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        mNfcHandler.handleIntent(intent, this)
+        Log.i("onNewIntent",intent.toString())
+        if (NfcAdapter.ACTION_TAG_DISCOVERED == intent.action) {
+            // Get the Tag object from the intent
+            val tag: Tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG) ?: return
+
+            // Create a new instance of MyHCEService and bind to it
+            val hceIntent = Intent(this, MyHCEService::class.java)
+            val messenger = Messenger(handler)
+            hceIntent.putExtra(EXTRA_MESSENGER, messenger)
+            startService(hceIntent)
+
+            // Get the IsoDep object and connect to the tag
+            val isoDep = IsoDep.get(tag)
+            isoDep.connect()
+
+            // Send an APDU command to the HCE service
+            val command = byteArrayOf(0x00, 0xA4.toByte(), 0x04, 0x00, 0x07, 0xA0.toByte(), 0x00, 0x00, 0x00, 0x03, 0x10, 0x10)
+            val response = isoDep.transceive(command)
+
+            // Close the IsoDep connection
+            isoDep.close()
+        }
+        //mNfcHandler.handleIntent(intent, this)
     }
 
     override fun onNfcRead(message: String) {
@@ -425,6 +465,8 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
             (data shr 0 and 0xff).toByte()
         )
     }
+
+    fun ByteArray.toHex(): String = joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 
     private fun convertByteArrayToInt(data: ByteArray?): Int {
         return if (data == null || data.size != 4) 0x0 else ( // NOTE: type cast not necessary for int

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Doprava_BP</string>
+    <string name="my_service_description">Service for NFC App</string>
+    <string name="my_aid_group_description">BP AID</string>
 </resources>
