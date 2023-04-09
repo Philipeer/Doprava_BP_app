@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.nfc.NfcAdapter
 import android.nfc.Tag
-import android.nfc.tech.IsoDep
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.util.Base64
 import android.util.Log
@@ -29,8 +31,12 @@ const val PREFS_NAME = "MyPrefsFile"
 
 class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
 
+    private val TAG = "MainActivity"
+    //private lateinit var nfcAdapter: NfcAdapter
+    private var myHCEService = MyHCEService()
     private var mContext: Context? = null
     private lateinit var mNfcHandler: NfcHandler
+    private var isBound = false
     private val handler = Handler(Handler.Callback { message ->
         // Get the response message from the service
         val response = message.obj as? ByteArray ?: return@Callback false
@@ -40,6 +46,31 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
 
         true
     })
+
+    //private val connection = object : ServiceConnection {
+    //    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+    //        val binder = service as MyHCEService.LocalBinder
+    //        myHCEService = binder.getService()
+    //        isBound = true
+    //    }
+//
+//
+    //    override fun onServiceDisconnected(name: ComponentName?) {
+    //        myHCEService = null
+    //        isBound = false
+    //    }
+    //}
+
+    private val nfcCallback = object : NfcAdapter.ReaderCallback {
+        override fun onTagDiscovered(tag: Tag?) {
+            val resultIntent = Intent().apply {
+                action = "com.example.doprava_bp.TRANSMIT_MESSAGE"
+                putExtra("message", "Hello from MainActivity!")
+                putExtra("tagId", tag?.id)
+            }
+            sendBroadcast(resultIntent)
+        }
+    }
 
     companion object {
         private const val EXTRA_MESSENGER = "com.example.myapp.EXTRA_MESSENGER"
@@ -93,13 +124,25 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val serviceIntent = Intent(this, MyHCEService::class.java)
-        startService(serviceIntent)
+        //val serviceIntent = Intent(this, MyHCEService::class.java)
+        //startService(serviceIntent)
 
         if (Build.VERSION.SDK_INT > 9) {
             val policy = ThreadPolicy.Builder().permitAll().build()
             StrictMode.setThreadPolicy(policy)
         }
+
+        //nfcAdapter = NfcAdapter.getDefaultAdapter(this)
+
+        // register the broadcast receiver
+        //val filter = IntentFilter("com.example.doprava_bp.TRANSMIT_MESSAGE")
+        //val receiver = MyBroadcastReceiver()
+        //registerReceiver(receiver, filter)
+        //if (!nfcAdapter.isEnabled) {
+        //    Toast.makeText(this, "NFC is disabled", Toast.LENGTH_LONG).show()
+        //}
+        val intent = Intent(this, MyHCEService::class.java)
+        //bindService(intent, connection, Context.BIND_AUTO_CREATE)
 
         mContext = applicationContext
         mNfcHandler = NfcHandler(this)
@@ -134,6 +177,10 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
         appParameters.atu = Base64.decode(sharedPreferences.getString("ATU", null), Base64.DEFAULT)
         appParameters.keyLengths = sharedPreferences.getInt("keyLenghts",0)
         tvAtu.text = appParameters.keyLengths.toString()
+        intent.putExtra("UserKey",appParameters.userKey)
+        intent.putExtra("Hatu",appParameters.hatu)
+        intent.putExtra("KeyLength",appParameters.keyLengths)
+        startService(intent)
         Log.i("keyLen:",appParameters.keyLengths.toString())
 
         btnConnection.setOnClickListener {
@@ -301,39 +348,68 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
         }
     }
 
+
    override fun onResume() {
        super.onResume()
-       mNfcHandler.enableForegroundDispatch()
+       //val pendingIntent = PendingIntent.getActivity(this, 0,
+       //    Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0)
+       //val filters = arrayOf(IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED))
+       //val techLists = arrayOf(arrayOf(NfcF::class.java.name))
+       //nfcAdapter.enableForegroundDispatch(this, pendingIntent, filters, techLists)
+       //nfcAdapter.enableReaderMode(this, nfcCallback, NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK, null)
    }
 
     override fun onPause() {
         super.onPause()
-        mNfcHandler.disableForegroundDispatch()
+        //nfcAdapter.disableForegroundDispatch(this)
+        //nfcAdapter.disableReaderMode(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isBound) {
+            //unbindService(connection)
+            isBound = false
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         Log.i("onNewIntent",intent.toString())
+        if (NfcAdapter.ACTION_TECH_DISCOVERED == intent.action) {
+            Log.i("onNewIntent","NfcAdapter.ACTION_TECH_DISCOVERED")
+            val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
+            //val myHceService = MyHCEService().LocalBinder().service
+            myHCEService.transmit(tag,"Test".toByteArray())
+        }
         if (NfcAdapter.ACTION_TAG_DISCOVERED == intent.action) {
             // Get the Tag object from the intent
-            val tag: Tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG) ?: return
 
-            // Create a new instance of MyHCEService and bind to it
-            val hceIntent = Intent(this, MyHCEService::class.java)
-            val messenger = Messenger(handler)
-            hceIntent.putExtra(EXTRA_MESSENGER, messenger)
-            startService(hceIntent)
-
-            // Get the IsoDep object and connect to the tag
-            val isoDep = IsoDep.get(tag)
-            isoDep.connect()
-
-            // Send an APDU command to the HCE service
-            val command = byteArrayOf(0x00, 0xA4.toByte(), 0x04, 0x00, 0x07, 0xA0.toByte(), 0x00, 0x00, 0x00, 0x03, 0x10, 0x10)
-            val response = isoDep.transceive(command)
-
-            // Close the IsoDep connection
-            isoDep.close()
+            //val tag: Tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG) ?: return
+//
+            //// Create a new instance of MyHCEService and bind to it
+            //val hceIntent = Intent(this, MyHCEService::class.java)
+            //val messenger = Messenger(handler)
+            //hceIntent.putExtra(EXTRA_MESSENGER, messenger)
+            //startService(hceIntent)
+            //
+//
+            //// Get the IsoDep object and connect to the tag
+            //val isoDep = IsoDep.get(tag)
+            //isoDep.connect()
+//
+            //// Send an APDU command to the HCE service
+            //val command = byteArrayOf(0x00, 0xA4.toByte(), 0x04, 0x00, 0x07, 0xA0.toByte(), 0x00, 0x00, 0x00, 0x03, 0x10, 0x10)
+            //val response = isoDep.transceive(command)
+//
+            //// Close the IsoDep connection
+            //isoDep.close()
+            Log.i("onNewIntent","NfcAdapter.ACTION_TAG_DISCOVERED")
+            val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
+            //val myHceService = MyHCEService().LocalBinder().service
+            myHCEService.transmit(tag,"Test".toByteArray())
+            //val pokus = "Ahoj".toByteArray()
+            //MyHCEService.getInstance().transmit(pokus)
         }
         //mNfcHandler.handleIntent(intent, this)
     }
@@ -345,6 +421,9 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
     override fun onNfcWrite(message: String) {
         Log.i("zapsaná data NFC:",message)
     }
+
+
+
   //
   // override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
   //     super.onActivityResult(requestCode, resultCode, data)
