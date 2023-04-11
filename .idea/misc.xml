@@ -5,6 +5,8 @@
       <map>
         <entry key="..\:/AndroidApps/Doprava_BP_u/Doprava_BP/app/src/main/res/layout/activity_main.xml" value="0.4" />
         <entry key="..\:/AndroidApps/Doprava_BP_u/Doprava_BP/app/src/main/res/layout/activity_main_zaloha.xml" value="0.25416666666666665" />
+        <entry key="..\:/AndroidApps/Doprava_BP_u/Doprava_BP/app/src/main/res/layout/authenticated_nfc.xml" value="0.264" />
+        <entry key="..\:/AndroidApps/Doprava_BP_u/Doprava_BP/app/src/main/res/layout/nauthenticated_nfc.xml" value="0.20778110303548525" />
         <entry key="..\:/AndroidApps/Doprava_BP_u/Doprava_BP/app/src/main/res/layout/pokus.xml" value="0.25416666666666665" />
         <entry key="..\:/AndroidApps/Doprava_BP_u/Doprava_BP/app/src/main/res/xml/apduservice.xml" value="0.253125" />
       </map>

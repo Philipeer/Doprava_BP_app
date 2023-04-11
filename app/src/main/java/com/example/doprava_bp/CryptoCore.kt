@@ -95,6 +95,8 @@ class CryptoCore(val appParameters: AppParameters, val userCryptogram: Cryptogra
         if (ukeyString != null) {
             ukeyString = ukeyString!!.substring(0,(appParameters.keyLengths/8))
         }
+        Log.i("ukeyString content: ",userKey + "user" + userCryptogram.nonce.toString() +
+                receiverCryptogram.nonce.toString())
         val command = "unlock"
         val ukey: SecretKey = SecretKeySpec(ukeyString!!.toByteArray(), "AES")
         val parameterSpec = GCMParameterSpec(128, getUserIv())

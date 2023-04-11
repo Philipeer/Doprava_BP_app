@@ -76,11 +76,11 @@ public class MyHCEService extends HostApduService implements IHCEBinder {
             Log.d(TAG,"zacatek protokolu pres NFC");
             userCryptogram = new Cryptogram();
             userCryptogram.setHatu(appParameters.getHatu());
-            userCryptogram.setIdr(2000);
+            userCryptogram.setNonce(2000);
             Log.i("Hatu string:",userCryptogram.getHatu());
             //Log.i("Hatu string:",Arrays.toString(userCryptogram.getHatu().getBytes()));
             ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
-            buffer.putInt(userCryptogram.getIdr());
+            buffer.putInt(userCryptogram.getNonce());
             byte[] byteArray = buffer.array();
             byte [] responseData = concatenateArrays(userCryptogram.getHatu().getBytes(),byteArray);
             //Log.i("posílá se:",Arrays.toString(responseData));
@@ -95,15 +95,23 @@ public class MyHCEService extends HostApduService implements IHCEBinder {
             return concatenateArrays(responseData, SELECT_OK_SW);
         }
         else if (Arrays.equals(commandHeader, new byte[]{0x00, 0x01, 0x02, 0x04})) {
-            Log.d(TAG,"NFC second step");
-            userCryptogram = new Cryptogram();
-            userCryptogram.setHatu(appParameters.getHatu());
-            userCryptogram.setIdr(2000);
-            ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
-            buffer.putInt(userCryptogram.getIdr());
-            byte[] byteArray = buffer.array();
-            byte [] responseData = concatenateArrays(userCryptogram.getHatu().getBytes(),byteArray);
+            cryptoCore = new CryptoCore(appParameters,userCryptogram,receiverCryptogram);
+            cryptoCore.setUserIv();
+            userCryptogram.cryptograms.add(cryptoCore.getFinalCipher());
+            byte [] cipher = decodeHexString(userCryptogram.cryptograms.get(0));
+            byte [] responseData = concatenateArrays(cipher,cryptoCore.getUserIv());
+            Log.i("posílá se:",Arrays.toString(responseData));
             return concatenateArrays(responseData, SELECT_OK_SW);
+        }
+        else if (Arrays.equals(commandHeader, new byte[]{0x00, 0x01, 0x02, 0x05})){
+            Log.i("autentizovan","auth");
+            Intent intent = new Intent(MyHCEService.this, AuthActivity.class);
+            startActivity(intent);
+            return SELECT_OK_SW;
+        }
+        else if (Arrays.equals(commandHeader, new byte[]{0x00, 0x01, 0x02, 0x06})){
+            Log.i("neautentizovan","auth");
+            return SELECT_OK_SW;
         }
         else {
             responseApdu = UNKNOWN_COMMAND;
@@ -125,6 +133,7 @@ public class MyHCEService extends HostApduService implements IHCEBinder {
             appParameters.setUserKey(intent.getStringExtra("UserKey"));
             appParameters.setHatu(intent.getStringExtra("Hatu"));
             appParameters.setKeyLengths(intent.getIntExtra("KeyLength",192));
+            appParameters.setATU(intent.getByteArrayExtra("Atu"));
             Log.d(TAG, "Received data from MainActivity");
         }
         return super.onStartCommand(intent, flags, startId);
@@ -160,6 +169,34 @@ public class MyHCEService extends HostApduService implements IHCEBinder {
             // Return the instance of MyHCEService for clients to call public methods on
             return MyHCEService.this;
         }
+    }
+
+    public byte[] decodeHexString(String hexString) {
+        if (hexString.length() % 2 == 1) {
+            throw new IllegalArgumentException(
+                    "Invalid hexadecimal String supplied.");
+        }
+
+        byte[] bytes = new byte[hexString.length() / 2];
+        for (int i = 0; i < hexString.length(); i += 2) {
+            bytes[i / 2] = hexToByte(hexString.substring(i, i + 2));
+        }
+        return bytes;
+    }
+
+    public byte hexToByte(String hexString) {
+        int firstDigit = toDigit(hexString.charAt(0));
+        int secondDigit = toDigit(hexString.charAt(1));
+        return (byte) ((firstDigit << 4) + secondDigit);
+    }
+
+    private int toDigit(char hexChar) {
+        int digit = Character.digit(hexChar, 16);
+        if(digit == -1) {
+            throw new IllegalArgumentException(
+                    "Invalid Hexadecimal Character: "+ hexChar);
+        }
+        return digit;
     }
 
 

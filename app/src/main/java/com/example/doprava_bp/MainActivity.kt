@@ -180,6 +180,7 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
         intent.putExtra("UserKey",appParameters.userKey)
         intent.putExtra("Hatu",appParameters.hatu)
         intent.putExtra("KeyLength",appParameters.keyLengths)
+        intent.putExtra("Atu",appParameters.atu)
         startService(intent)
         Log.i("keyLen:",appParameters.keyLengths.toString())
 
