@@ -111,6 +111,8 @@ public class MyHCEService extends HostApduService implements IHCEBinder {
         }
         else if (Arrays.equals(commandHeader, new byte[]{0x00, 0x01, 0x02, 0x06})){
             Log.i("neautentizovan","auth");
+            Intent intent = new Intent(MyHCEService.this,NauthActivity.class);
+            startActivity(intent);
             return SELECT_OK_SW;
         }
         else {

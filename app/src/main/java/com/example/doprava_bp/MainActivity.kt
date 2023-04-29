@@ -12,7 +12,9 @@ import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.util.Base64
 import android.util.Log
-import android.widget.*
+import android.widget.Button
+import android.widget.Switch
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import java.io.ObjectInputStream
@@ -31,6 +33,7 @@ const val PREFS_NAME = "MyPrefsFile"
 
 class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
 
+    private val KEY_LENGTH = 256
     private val TAG = "MainActivity"
     //private lateinit var nfcAdapter: NfcAdapter
     private var myHCEService = MyHCEService()
@@ -146,12 +149,16 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
 
         mContext = applicationContext
         mNfcHandler = NfcHandler(this)
-        val sharedPreferences = getSharedPreferences("AppParameters", Context.MODE_PRIVATE)
+        var sharedPreferences = getSharedPreferences("AppParameters", Context.MODE_PRIVATE)
+        val sharedPreferences128 = getSharedPreferences("AppParameters128", Context.MODE_PRIVATE)
+        val sharedPreferences192 = getSharedPreferences("AppParameters192", Context.MODE_PRIVATE)
+        val sharedPreferences256 = getSharedPreferences("AppParameters256", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
+        val editor128 = sharedPreferences128.edit()
+        val editor192 = sharedPreferences192.edit()
+        val editor256 = sharedPreferences256.edit()
         val appParameters = AppParameters()
 
-        val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
-        val checkedId = radioGroup.checkedRadioButtonId
         val btnConnection = findViewById<Button>(R.id.btnConnection)
         val btnAuth = findViewById<Button>(R.id.btnAuth)
         val button = findViewById<Button>(R.id.button)
@@ -170,31 +177,118 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
         //lateinit var bluetoothHandler: BluetoothHandler
         lateinit var bluetoothHandler: BluetoothHandlerV2
 
-        tvUserKey.text = sharedPreferences.getString("userKey",null)
-        tvHatu.text = sharedPreferences.getString("hatu",null)
-        appParameters.userKey = sharedPreferences.getString("userKey",null)
-        appParameters.hatu = sharedPreferences.getString("hatu",null)
-        appParameters.atu = Base64.decode(sharedPreferences.getString("ATU", null), Base64.DEFAULT)
-        appParameters.keyLengths = sharedPreferences.getInt("keyLenghts",0)
-        tvAtu.text = appParameters.keyLengths.toString()
-        intent.putExtra("UserKey",appParameters.userKey)
-        intent.putExtra("Hatu",appParameters.hatu)
-        intent.putExtra("KeyLength",appParameters.keyLengths)
-        intent.putExtra("Atu",appParameters.atu)
-        startService(intent)
-        Log.i("keyLen:",appParameters.keyLengths.toString())
+        if (KEY_LENGTH == 128 && (sharedPreferences128 != null)){
+            tvUserKey.text = sharedPreferences128.getString("userKey", null)
+            tvHatu.text = sharedPreferences128.getString("hatu", null)
+            appParameters.userKey = sharedPreferences128.getString("userKey", null)
+            appParameters.hatu = sharedPreferences128.getString("hatu", null)
+            appParameters.atu =
+                Base64.decode(sharedPreferences128.getString("ATU", null), Base64.DEFAULT)
+            appParameters.keyLengths = sharedPreferences128.getInt("keyLenghts", 0)
+            tvAtu.text = appParameters.keyLengths.toString()
+            intent.putExtra("UserKey", appParameters.userKey)
+            intent.putExtra("Hatu", appParameters.hatu)
+            intent.putExtra("KeyLength", appParameters.keyLengths)
+            intent.putExtra("Atu", appParameters.atu)
+            startService(intent)
+            Log.i("keyLen:", appParameters.keyLengths.toString())
+        }
+        else if (KEY_LENGTH == 192 && (sharedPreferences192 != null))
+        {
+            tvUserKey.text = sharedPreferences192.getString("userKey", null)
+            tvHatu.text = sharedPreferences192.getString("hatu", null)
+            appParameters.userKey = sharedPreferences192.getString("userKey", null)
+            appParameters.hatu = sharedPreferences192.getString("hatu", null)
+            appParameters.atu =
+                Base64.decode(sharedPreferences192.getString("ATU", null), Base64.DEFAULT)
+            appParameters.keyLengths = sharedPreferences192.getInt("keyLenghts", 0)
+            tvAtu.text = appParameters.keyLengths.toString()
+            intent.putExtra("UserKey", appParameters.userKey)
+            intent.putExtra("Hatu", appParameters.hatu)
+            intent.putExtra("KeyLength", appParameters.keyLengths)
+            intent.putExtra("Atu", appParameters.atu)
+            startService(intent)
+            Log.i("keyLen:", appParameters.keyLengths.toString())
+        }
+        else if (KEY_LENGTH == 256 && (sharedPreferences256 != null))
+        {
+            tvUserKey.text = sharedPreferences256.getString("userKey", null)
+            tvHatu.text = sharedPreferences256.getString("hatu", null)
+            appParameters.userKey = sharedPreferences256.getString("userKey", null)
+            appParameters.hatu = sharedPreferences256.getString("hatu", null)
+            appParameters.atu =
+                Base64.decode(sharedPreferences256.getString("ATU", null), Base64.DEFAULT)
+            appParameters.keyLengths = sharedPreferences256.getInt("keyLenghts", 0)
+            tvAtu.text = appParameters.keyLengths.toString()
+            intent.putExtra("UserKey", appParameters.userKey)
+            intent.putExtra("Hatu", appParameters.hatu)
+            intent.putExtra("KeyLength", appParameters.keyLengths)
+            intent.putExtra("Atu", appParameters.atu)
+            startService(intent)
+            Log.i("keyLen:", appParameters.keyLengths.toString())
+        }
+        else {
+            tvUserKey.text = sharedPreferences.getString("userKey", null)
+            tvHatu.text = sharedPreferences.getString("hatu", null)
+            appParameters.userKey = sharedPreferences.getString("userKey", null)
+            appParameters.hatu = sharedPreferences.getString("hatu", null)
+            appParameters.atu =
+                Base64.decode(sharedPreferences.getString("ATU", null), Base64.DEFAULT)
+            appParameters.keyLengths = sharedPreferences.getInt("keyLenghts", 0)
+            tvAtu.text = appParameters.keyLengths.toString()
+            intent.putExtra("UserKey", appParameters.userKey)
+            intent.putExtra("Hatu", appParameters.hatu)
+            intent.putExtra("KeyLength", appParameters.keyLengths)
+            intent.putExtra("Atu", appParameters.atu)
+            startService(intent)
+            Log.i("keyLen:", appParameters.keyLengths.toString())
+        }
+        //editor192.putString("userKey", appParameters.userKey)
+        //editor192.putString("hatu", appParameters.hatu)
+        //editor192.putString("ATU", Base64.encodeToString(appParameters.atu, Base64.DEFAULT))
+        //editor192.putInt("keyLenghts", appParameters.keyLengths)
+        //editor192.apply()
+
 
         btnConnection.setOnClickListener {
 
-            client.receiveParamsFromIdP()
-            editor.putString("userKey", client.appParameters.userKey)
-            editor.putString("hatu", client.appParameters.hatu)
-            editor.putString("ATU", Base64.encodeToString(client.appParameters.atu, Base64.DEFAULT))
-            editor.putInt("keyLenghts", client.appParameters.keyLengths)
-            editor.apply()
-            tvUserKey.text = sharedPreferences.getString("userKey",null)
-            tvHatu.text = sharedPreferences.getString("hatu",null)
-            tvAtu.text = sharedPreferences.getString("atu",null)
+            if(KEY_LENGTH == 128)
+            {
+                client.receiveParamsFromIdP()
+                editor128.putString("userKey", client.appParameters.userKey)
+                editor128.putString("hatu", client.appParameters.hatu)
+                editor128.putString("ATU", Base64.encodeToString(client.appParameters.atu, Base64.DEFAULT))
+                editor128.putInt("keyLenghts", client.appParameters.keyLengths)
+                editor128.apply()
+                tvUserKey.text = sharedPreferences128.getString("userKey",null)
+                tvHatu.text = sharedPreferences128.getString("hatu",null)
+                tvAtu.text = sharedPreferences128.getString("atu",null)
+            }
+            else if (KEY_LENGTH == 192)
+            {
+                client.receiveParamsFromIdP()
+                editor192.putString("userKey", client.appParameters.userKey)
+                editor192.putString("hatu", client.appParameters.hatu)
+                editor192.putString("ATU", Base64.encodeToString(client.appParameters.atu, Base64.DEFAULT))
+                editor192.putInt("keyLenghts", client.appParameters.keyLengths)
+                editor192.apply()
+                tvUserKey.text = sharedPreferences192.getString("userKey",null)
+                tvHatu.text = sharedPreferences192.getString("hatu",null)
+                tvAtu.text = sharedPreferences192.getString("atu",null)
+            }
+            else{
+                client.receiveParamsFromIdP()
+                editor256.putString("userKey", client.appParameters.userKey)
+                editor256.putString("hatu", client.appParameters.hatu)
+                editor256.putString("ATU", Base64.encodeToString(client.appParameters.atu, Base64.DEFAULT))
+                editor256.putInt("keyLenghts", client.appParameters.keyLengths)
+                editor256.apply()
+                tvUserKey.text = sharedPreferences256.getString("userKey",null)
+                tvHatu.text = sharedPreferences256.getString("hatu",null)
+                tvAtu.text = sharedPreferences256.getString("atu",null)
+            }
+
+
             /*
             val socket = Socket("192.168.56.1", 10001)
             val objectOutputStream = ObjectOutputStream(socket.getOutputStream())
@@ -219,6 +313,8 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
         }
 
         button.setOnClickListener {
+
+            val ip = "10.0.0.84"
             //TCP case
             val nu = rnd.nextInt()
             var userCryptogram = Cryptogram()
@@ -227,7 +323,7 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
             userCryptogram.hatu = appParameters.hatu
 
             //výměna nonces
-            var socket = Socket("10.0.0.72", 10001)
+            var socket = Socket(ip, 10001)
             var objectOutputStream = ObjectOutputStream(socket.getOutputStream())
             var objectInputStream = ObjectInputStream(socket.getInputStream())
             objectOutputStream.writeObject(userCryptogram)
@@ -239,20 +335,29 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
             val cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram)
             cryptoCore.setUserIv()
             userCryptogram.cryptograms.add(cryptoCore.getFinalCipher())
-            socket = Socket("10.0.0.72", 10001)
+            socket = Socket(ip, 10003)
             objectOutputStream = ObjectOutputStream(socket.getOutputStream())
             objectOutputStream.writeObject(userCryptogram)
             objectOutputStream.close() //??
             socket.close()
 
-            //TODO: PŘIJMUTÍ VÝSLEDKU AUTENTIZACE
-            socket = Socket("10.0.0.72", 10002)
-            objectOutputStream = ObjectOutputStream(socket.getOutputStream())
-            objectInputStream = ObjectInputStream(socket.getInputStream())
-            objectOutputStream.writeObject(userCryptogram)
+            //PŘIJMUTÍ VÝSLEDKU AUTENTIZACE
+            val socket3 = Socket(ip, 10002)
+            objectOutputStream = ObjectOutputStream(socket3.getOutputStream())
+            objectInputStream = ObjectInputStream(socket3.getInputStream())
+            //objectOutputStream.writeObject(userCryptogram)
             receiverCryptogram = objectInputStream.readObject() as Cryptogram
             Log.i("TCP Auth:",receiverCryptogram.isAuthenticated.toString())
-            socket.close()
+            socket3.close()
+
+            if(receiverCryptogram.isAuthenticated){
+                val intentTcp = Intent(this,AuthActivityTcp::class.java)
+                startActivity(intentTcp)
+            }
+            else {
+                val intentTcp = Intent(this,NauthActivityTcp::class.java)
+                startActivity(intentTcp)
+            }
         }
 
         //scan_button.setOnClickListener { startBleScan() }
@@ -266,81 +371,30 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
                 }
             }
 
-            if (checkedId != -1) {
-                val checkedRadioButton = findViewById<RadioButton>(checkedId)
-                when (checkedRadioButton) {
-                    findViewById<RadioButton>(R.id.radioBLE) -> {
-                        val permission1 = "android.permission.BLUETOOTH_CONNECT"
-                        val permission2= "android.permission.ACCESS_FINE_LOCATION"
-                        val permission21= "android.permission.ACCESS_COARSE_LOCATION"
-                        val permission3= "android.permission.BLUETOOTH_SCAN"
-                        val permission4 = "android.permission.BLUETOOTH_ADMIN"
-                        val permission5 = "android.permission.ACCESS_BACKGROUND_LOCATION"
-                        requestPermissions(arrayOf(permission1,permission2,permission3,permission4,permission21,permission5), ENABLE_BLUETOOTH_REQUEST_CODE)
-                        //bluetoothHandler.central.connectPeripheral(bluetoothHandler.peripheral,bluetoothHandler.peripheralCallback)
-                        val SERVICE_UUID = UUID.fromString("18b41747-01df-44d1-bc25-187082eb76bf")
-                        bluetoothHandler = BluetoothHandlerV2(applicationContext,appParameters) //ZDE PŘIDĚLAT SWITCHSTATUS
-                        bluetoothHandler.central.scanForPeripheralsWithServices(arrayOf(
-                            SERVICE_UUID
-                        ));
-                        /*bluetoothHandler = BluetoothHandler(applicationContext,appParameters)
-                        bluetoothHandler.central.scanForPeripheralsWithServices(arrayOf(
-                            SERVICE_UUID
-                        ));*/
-                        //bluetoothHandler.central.scanForPeripherals()
-                        //tvIdr.text = bluetoothHandler.receiverCryptogram.idr.toString()
-                        tvUserNonce.text = bluetoothHandler.userCryptogram.nonce.toString()
-                        tvReceiverNonce.text = bluetoothHandler.receiverCryptogram.nonce.toString()
-                        tvAuthenticated.text = bluetoothHandler.userCryptogram.isAuthenticated.toString()
-                    }
-                    findViewById<RadioButton>(R.id.radioWifi) -> {
-                        //TCP case
-                        val nu = rnd.nextInt()
-                        var userCryptogram = Cryptogram()
-                        var receiverCryptogram = Cryptogram()
-                        userCryptogram.nonce = nu
-                        userCryptogram.hatu = appParameters.hatu
+            val permission1 = "android.permission.BLUETOOTH_CONNECT"
+            val permission2= "android.permission.ACCESS_FINE_LOCATION"
+            val permission21= "android.permission.ACCESS_COARSE_LOCATION"
+            val permission3= "android.permission.BLUETOOTH_SCAN"
+            val permission4 = "android.permission.BLUETOOTH_ADMIN"
+            val permission5 = "android.permission.ACCESS_BACKGROUND_LOCATION"
+            requestPermissions(arrayOf(permission1,permission2,permission3,permission4,permission21,permission5), ENABLE_BLUETOOTH_REQUEST_CODE)
+            //bluetoothHandler.central.connectPeripheral(bluetoothHandler.peripheral,bluetoothHandler.peripheralCallback)
+            val SERVICE_UUID = UUID.fromString("18b41747-01df-44d1-bc25-187082eb76bf")
+            bluetoothHandler = BluetoothHandlerV2(applicationContext,appParameters) //ZDE PŘIDĚLAT SWITCHSTATUS
+            bluetoothHandler.central.scanForPeripheralsWithServices(arrayOf(
+                SERVICE_UUID
+            ));
+            /*bluetoothHandler = BluetoothHandler(applicationContext,appParameters)
+            bluetoothHandler.central.scanForPeripheralsWithServices(arrayOf(
+                SERVICE_UUID
+            ));*/
+            //bluetoothHandler.central.scanForPeripherals()
+            //tvIdr.text = bluetoothHandler.receiverCryptogram.idr.toString()
+            tvUserNonce.text = bluetoothHandler.userCryptogram.nonce.toString()
+            tvReceiverNonce.text = bluetoothHandler.receiverCryptogram.nonce.toString()
+            tvAuthenticated.text = bluetoothHandler.userCryptogram.isAuthenticated.toString()
 
-                        //výměna nonces
-                        var socket = Socket("10.0.0.72", 10001)
-                        var objectOutputStream = ObjectOutputStream(socket.getOutputStream())
-                        var objectInputStream = ObjectInputStream(socket.getInputStream())
-                        objectOutputStream.writeObject(userCryptogram)
-                        receiverCryptogram = objectInputStream.readObject() as Cryptogram
-                        objectOutputStream.close() //??
-                        socket.close()
 
-                        //vypocitani ciphertextu a jeho poslání
-                        val cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram)
-                        cryptoCore.setUserIv()
-                        userCryptogram.cryptograms.add(cryptoCore.getFinalCipher())
-                        socket = Socket("10.0.0.72", 10001)
-                        objectOutputStream = ObjectOutputStream(socket.getOutputStream())
-                        objectOutputStream.writeObject(userCryptogram)
-                        objectOutputStream.close() //??
-                        socket.close()
-
-                        //TODO: PŘIJMUTÍ VÝSLEDKU AUTENTIZACE
-                        socket = Socket("10.0.0.72", 10002)
-                        objectOutputStream = ObjectOutputStream(socket.getOutputStream())
-                        objectInputStream = ObjectInputStream(socket.getInputStream())
-                        objectOutputStream.writeObject(userCryptogram)
-                        receiverCryptogram = objectInputStream.readObject() as Cryptogram
-                        Log.i("TCP Auth:",receiverCryptogram.isAuthenticated.toString())
-                        socket.close()
-                    }
-                    findViewById<RadioButton>(R.id.radioNFC) -> {
-                        // Handle the case when the "NFC" radio button is selected
-                        // Perform the appropriate action here
-                    }
-                    else -> {
-                        // Handle other cases when a RadioButton other than "BLE", "WiFi", or "NFC" is selected
-                        // Perform the appropriate action here
-                    }
-                }
-            } else {
-                // No RadioButton is checked
-            }
 
 
 

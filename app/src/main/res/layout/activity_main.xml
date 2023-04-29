@@ -138,10 +138,10 @@
         android:id="@+id/btnBleCon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:text="Připojit se BLE"
         app:layout_constraintStart_toStartOf="@+id/btnAuth"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+        app:layout_constraintTop_toBottomOf="@+id/authenticatedLabel" />
 
 
     <Switch
@@ -162,41 +162,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:text="Button"
+        android:text="WI-FI"
         app:layout_constraintStart_toEndOf="@+id/btnBleCon"
         app:layout_constraintTop_toTopOf="@+id/btnBleCon" />
-
-    <RadioGroup
-        android:id="@+id/radioGroup"
-        android:layout_width="242dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="4dp"
-        android:orientation="horizontal"
-        app:layout_constraintStart_toStartOf="@+id/authenticatedLabel"
-        app:layout_constraintTop_toBottomOf="@+id/authenticatedLabel">
-
-        <RadioButton
-            android:id="@+id/radioBLE"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="BLE" />
-
-        <RadioButton
-            android:id="@+id/radioWifi"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="WiFi" />
-
-        <RadioButton
-            android:id="@+id/radioNFC"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="NFC" />
-
-    </RadioGroup>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

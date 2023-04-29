@@ -31,7 +31,7 @@ public class Client {
         //Socket socket = new Socket("192.168.126.1", 10001);
         //Socket socket = new Socket("192.168.99.1", 10001);
         //Socket socket = new Socket("10.0.0.30", 10001); //BV
-        Socket socket = new Socket("10.0.0.176", 10001); //BV
+        Socket socket = new Socket("10.0.0.74", 10001); //BV
         //Socket socket = new Socket("100.69.147.13", 10001); //vut
         //Socket socket = new Socket("172.20.10.6", 10001); //hotspot
 

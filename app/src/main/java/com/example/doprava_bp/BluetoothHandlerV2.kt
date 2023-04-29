@@ -3,6 +3,7 @@ package com.example.doprava_bp
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.le.ScanResult
 import android.content.Context
+import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -134,8 +135,18 @@ class BluetoothHandlerV2(val context: Context, val appParameters: AppParameters)
                 }
 
                 if (cryptogramCounter == 4){
+                    val auth = parser.getStringValue(0)
                     Log.i("C2:",parser.getStringValue(0))
-                    userCryptogram.isAuthenticated = true
+                    if(auth.equals("true")){
+                        val intentBle = Intent(context, AuthActivityBle::class.java)
+                        context.startActivity(intentBle)
+                    }
+                    else {
+                        val intentBle = Intent(context, NauthActivityBle::class.java)
+                        context.startActivity(intentBle)
+
+                    }
+
                 }/*
                 if (characteristicUUID.equals(CRYPTOGRAM_USER_CHAR_UUID)){
                     cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram)
