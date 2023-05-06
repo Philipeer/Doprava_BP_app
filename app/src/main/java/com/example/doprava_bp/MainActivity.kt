@@ -33,7 +33,7 @@ const val PREFS_NAME = "MyPrefsFile"
 
 class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
 
-    private val KEY_LENGTH = 256
+    private val KEY_LENGTH = 128
     private val TAG = "MainActivity"
     //private lateinit var nfcAdapter: NfcAdapter
     private var myHCEService = MyHCEService()
@@ -228,20 +228,25 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
             Log.i("keyLen:", appParameters.keyLengths.toString())
         }
         else {
-            tvUserKey.text = sharedPreferences.getString("userKey", null)
-            tvHatu.text = sharedPreferences.getString("hatu", null)
-            appParameters.userKey = sharedPreferences.getString("userKey", null)
-            appParameters.hatu = sharedPreferences.getString("hatu", null)
-            appParameters.atu =
-                Base64.decode(sharedPreferences.getString("ATU", null), Base64.DEFAULT)
-            appParameters.keyLengths = sharedPreferences.getInt("keyLenghts", 0)
-            tvAtu.text = appParameters.keyLengths.toString()
-            intent.putExtra("UserKey", appParameters.userKey)
-            intent.putExtra("Hatu", appParameters.hatu)
-            intent.putExtra("KeyLength", appParameters.keyLengths)
-            intent.putExtra("Atu", appParameters.atu)
-            startService(intent)
-            Log.i("keyLen:", appParameters.keyLengths.toString())
+            if(sharedPreferences.getString("userKey", null) == null) {
+                tvUserKey.text = sharedPreferences.getString("userKey", null)
+                tvHatu.text = sharedPreferences.getString("hatu", null)
+                appParameters.userKey = sharedPreferences.getString("userKey", null)
+                appParameters.hatu = sharedPreferences.getString("hatu", null)
+                appParameters.atu =
+                    Base64.decode(sharedPreferences.getString("ATU", null), Base64.DEFAULT)
+                appParameters.keyLengths = sharedPreferences.getInt("keyLenghts", 0)
+                tvAtu.text = appParameters.keyLengths.toString()
+                intent.putExtra("UserKey", appParameters.userKey)
+                intent.putExtra("Hatu", appParameters.hatu)
+                intent.putExtra("KeyLength", appParameters.keyLengths)
+                intent.putExtra("Atu", appParameters.atu)
+                startService(intent)
+                Log.i("keyLen:", appParameters.keyLengths.toString())
+            }
+            else{
+                tvAuthenticated.text = "Je potřeba si vyžádat klíče"
+            }
         }
         //editor192.putString("userKey", appParameters.userKey)
         //editor192.putString("hatu", appParameters.hatu)
@@ -314,7 +319,7 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
 
         button.setOnClickListener {
 
-            val ip = "10.0.0.84"
+            val ip = "172.20.10.6"
             //TCP case
             val nu = rnd.nextInt()
             var userCryptogram = Cryptogram()
@@ -332,19 +337,25 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
             socket.close()
 
             //vypocitani ciphertextu a jeho poslání
-            val cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram)
+            var command = "unlock"
+            if (switchLock.isChecked) {command = "unlock"}
+            else {command = "lock"}
+            val cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram, command)
             cryptoCore.setUserIv()
             userCryptogram.cryptograms.add(cryptoCore.getFinalCipher())
-            socket = Socket(ip, 10003)
-            objectOutputStream = ObjectOutputStream(socket.getOutputStream())
+            var socket2 = Socket(ip, 10003)
+            objectOutputStream = ObjectOutputStream(socket2.getOutputStream())
             objectOutputStream.writeObject(userCryptogram)
             objectOutputStream.close() //??
-            socket.close()
+            socket2.close()
 
             //PŘIJMUTÍ VÝSLEDKU AUTENTIZACE
-            val socket3 = Socket(ip, 10002)
+
+            //pro pc
+            val socket3 = Socket(ip, 10004)
             objectOutputStream = ObjectOutputStream(socket3.getOutputStream())
             objectInputStream = ObjectInputStream(socket3.getInputStream())
+
             //objectOutputStream.writeObject(userCryptogram)
             receiverCryptogram = objectInputStream.readObject() as Cryptogram
             Log.i("TCP Auth:",receiverCryptogram.isAuthenticated.toString())
@@ -380,7 +391,10 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
             requestPermissions(arrayOf(permission1,permission2,permission3,permission4,permission21,permission5), ENABLE_BLUETOOTH_REQUEST_CODE)
             //bluetoothHandler.central.connectPeripheral(bluetoothHandler.peripheral,bluetoothHandler.peripheralCallback)
             val SERVICE_UUID = UUID.fromString("18b41747-01df-44d1-bc25-187082eb76bf")
-            bluetoothHandler = BluetoothHandlerV2(applicationContext,appParameters) //ZDE PŘIDĚLAT SWITCHSTATUS
+            var command = "unlock"
+            if (switchLock.isChecked) {command = "unlock"}
+            else {command = "lock"}
+            bluetoothHandler = BluetoothHandlerV2(applicationContext,appParameters,command) //ZDE PŘIDĚLAT SWITCHSTATUS
             bluetoothHandler.central.scanForPeripheralsWithServices(arrayOf(
                 SERVICE_UUID
             ));

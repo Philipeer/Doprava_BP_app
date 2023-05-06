@@ -11,7 +11,7 @@ import com.welie.blessed.*
 import java.util.*
 
 
-class BluetoothHandlerV2(val context: Context, val appParameters: AppParameters) {
+class BluetoothHandlerV2(val context: Context, val appParameters: AppParameters, val command: String) {
 
     private val rnd : Random = Random()
     val userCryptogram : Cryptogram = Cryptogram()
@@ -119,7 +119,7 @@ class BluetoothHandlerV2(val context: Context, val appParameters: AppParameters)
                     val ivCharacteristic = peripheral.getCharacteristic(SERVICE_UUID, IV_USER_CHAR_UUID)
                     val cryptogramCharacteristic = peripheral.getCharacteristic(SERVICE_UUID, CRYPTOGRAM_USER_CHAR_UUID)
                     if (cryptogramCharacteristic != null){
-                        cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram)
+                        cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram,command)
                         cryptoCore.setUserIv()
                         peripheral.setNotify(cryptogramCharacteristic, true)
                         val bluetoothBytesParser : BluetoothBytesParser = BluetoothBytesParser()
@@ -128,7 +128,7 @@ class BluetoothHandlerV2(val context: Context, val appParameters: AppParameters)
                         cryptogramCounter = 4
                     }
                     if (ivCharacteristic != null){
-                        cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram)
+                        cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram,command)
                         peripheral.setNotify(ivCharacteristic, true)
                         peripheral.writeCharacteristic(ivCharacteristic,cryptoCore.getUserIv(),WriteType.WITH_RESPONSE)
                     }

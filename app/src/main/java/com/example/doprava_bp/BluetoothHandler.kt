@@ -10,7 +10,7 @@ import com.welie.blessed.*
 import java.util.*
 
 
-class BluetoothHandler(val context: Context, val appParameters: AppParameters) {
+class BluetoothHandler(val context: Context, val appParameters: AppParameters,val command: String) {
 
     private val rnd : Random = Random()
     val userCryptogram : Cryptogram = Cryptogram()
@@ -118,14 +118,14 @@ class BluetoothHandler(val context: Context, val appParameters: AppParameters) {
                     val ivCharacteristic = peripheral.getCharacteristic(SERVICE_UUID, IV_USER_CHAR_UUID)
                     val cryptogramCharacteristic = peripheral.getCharacteristic(SERVICE_UUID, CRYPTOGRAM_USER_CHAR_UUID)
                     if (cryptogramCharacteristic != null){
-                        cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram)
+                        cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram,command)
                         peripheral.setNotify(cryptogramCharacteristic, true)
                         val bluetoothBytesParser : BluetoothBytesParser = BluetoothBytesParser()
                         bluetoothBytesParser.setString(cryptoCore.getCipherText())
                         peripheral.writeCharacteristic(cryptogramCharacteristic,bluetoothBytesParser.value,WriteType.WITH_RESPONSE)
                     }
                     if (ivCharacteristic != null){
-                        cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram)
+                        cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram,command)
                         peripheral.setNotify(ivCharacteristic, true)
                         peripheral.writeCharacteristic(ivCharacteristic,cryptoCore.getUserIv(),WriteType.WITH_RESPONSE)
                     }
@@ -136,7 +136,7 @@ class BluetoothHandler(val context: Context, val appParameters: AppParameters) {
                     userCryptogram.isAuthenticated = true
                 }
                 if (characteristicUUID.equals(CRYPTOGRAM_USER_CHAR_UUID)){
-                    cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram)
+                    cryptoCore = CryptoCore(appParameters,userCryptogram,receiverCryptogram,command)
                     if (cryptogramCounter == 2){
                         Log.i("C2:",parser.getStringValue(0))
                         val cryptogramCharacteristic = peripheral.getCharacteristic(SERVICE_UUID, CRYPTOGRAM_USER_CHAR_UUID)

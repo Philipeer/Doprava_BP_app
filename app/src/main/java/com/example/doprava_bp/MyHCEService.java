@@ -95,7 +95,7 @@ public class MyHCEService extends HostApduService implements IHCEBinder {
             return concatenateArrays(responseData, SELECT_OK_SW);
         }
         else if (Arrays.equals(commandHeader, new byte[]{0x00, 0x01, 0x02, 0x04})) {
-            cryptoCore = new CryptoCore(appParameters,userCryptogram,receiverCryptogram);
+            cryptoCore = new CryptoCore(appParameters,userCryptogram,receiverCryptogram,"unlock");
             cryptoCore.setUserIv();
             userCryptogram.cryptograms.add(cryptoCore.getFinalCipher());
             byte [] cipher = decodeHexString(userCryptogram.cryptograms.get(0));

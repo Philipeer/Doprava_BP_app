@@ -12,7 +12,7 @@ import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 class CryptoCore(val appParameters: AppParameters, val userCryptogram: Cryptogram,
-                 val receiverCryptogram: Cryptogram) {
+                 val receiverCryptogram: Cryptogram, val command: String) {
 
     val GCM_IV_LENGTH = 12
    // private var ukeyString = hash(appParameters.userKey + "user" + userCryptogram.nonce.toString() +
@@ -97,7 +97,7 @@ class CryptoCore(val appParameters: AppParameters, val userCryptogram: Cryptogra
         }
         Log.i("ukeyString content: ",userKey + "user" + userCryptogram.nonce.toString() +
                 receiverCryptogram.nonce.toString())
-        val command = "unlock"
+        //val command = "unlock"
         val ukey: SecretKey = SecretKeySpec(ukeyString!!.toByteArray(), "AES")
         val parameterSpec = GCMParameterSpec(128, getUserIv())
         val cipherC3 = Cipher.getInstance("AES/GCM/NoPadding")
