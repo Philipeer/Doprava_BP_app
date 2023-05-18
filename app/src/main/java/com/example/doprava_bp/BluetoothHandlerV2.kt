@@ -27,35 +27,6 @@ class BluetoothHandlerV2(val context: Context, val appParameters: AppParameters,
     private val CRYPTOGRAM_USER_CHAR_UUID = UUID.fromString("23cab78f-28d9-4ecb-bfd1-1bba7b486fa3")
     var cryptogramCounter = 2
 
-  //  private val nonceUserCharacteristic : BluetoothGattCharacteristic =
-  //      BluetoothGattCharacteristic(
-  //          UUID.fromString("bc3ba145-f588-4f86-8bc4-fb925a23dc31"),
-  //          BluetoothGattCharacteristic.PROPERTY_WRITE + BluetoothGattCharacteristic.PROPERTY_NOTIFY, BluetoothGattCharacteristic.PERMISSION_WRITE)
-//
-  //  private val nonceReceiverCharacteristic : BluetoothGattCharacteristic =
-  //      BluetoothGattCharacteristic(
-  //          UUID.fromString("c8ba0ef6-5c27-11ed-9b6a-0242ac120002"),
-  //          BluetoothGattCharacteristic.PROPERTY_READ, BluetoothGattCharacteristic.PERMISSION_READ)
-//
-  //  private val idrCharacteristic : BluetoothGattCharacteristic =
-  //      BluetoothGattCharacteristic(
-  //          UUID.fromString("01e6ee2d-420a-4380-8e14-2a83844d4ae8"),
-  //          BluetoothGattCharacteristic.PROPERTY_READ, BluetoothGattCharacteristic.PERMISSION_READ)
-//
-  //  private val hatuCharacteristic : BluetoothGattCharacteristic =
-  //      BluetoothGattCharacteristic(
-  //          UUID.fromString("b828f7a3-157a-4a4e-9c9b-3feb19b8e90d"),
-  //          BluetoothGattCharacteristic.PROPERTY_WRITE, BluetoothGattCharacteristic.PERMISSION_WRITE )
-//
-  //  private val ivCharacteristic : BluetoothGattCharacteristic =
-  //      BluetoothGattCharacteristic(
-  //          UUID.fromString("27938afb-f6f0-4e19-a4b2-2545da6bad40"),
-  //          BluetoothGattCharacteristic.PROPERTY_WRITE, BluetoothGattCharacteristic.PERMISSION_WRITE )
-//
-  //  private val cryptogramCharacteristic : BluetoothGattCharacteristic =
-  //      BluetoothGattCharacteristic(
-  //          UUID.fromString("23cab78f-28d9-4ecb-bfd1-1bba7b486fa3"),
-  //          BluetoothGattCharacteristic.PROPERTY_WRITE, BluetoothGattCharacteristic.PERMISSION_WRITE )
 
     val peripheralCallback : BluetoothPeripheralCallback =
         object : BluetoothPeripheralCallback() {
