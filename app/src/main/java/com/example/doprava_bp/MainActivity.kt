@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
             Log.i("keyLen:", appParameters.keyLengths.toString())
         }
         else {
-            if(sharedPreferences.getString("userKey", null) == null) {
+            if(sharedPreferences.getString("userKey", null) != null) {
                 tvUserKey.text = sharedPreferences.getString("userKey", null)
                 tvHatu.text = sharedPreferences.getString("hatu", null)
                 appParameters.userKey = sharedPreferences.getString("userKey", null)
