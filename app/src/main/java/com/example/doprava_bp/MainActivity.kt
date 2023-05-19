@@ -96,6 +96,8 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
         lateinit var bluetoothHandler: BluetoothHandlerV2
 
         if (KEY_LENGTH == 128 && (sharedPreferences128 != null)){
+            if(sharedPreferences128.getString("userKey", null) != null){
+
             tvUserKey.text = sharedPreferences128.getString("userKey", null)
             tvHatu.text = sharedPreferences128.getString("hatu", null)
             appParameters.userKey = sharedPreferences128.getString("userKey", null)
@@ -110,40 +112,55 @@ class MainActivity : AppCompatActivity(), NfcHandler.NfcListener {
             intent.putExtra("Atu", appParameters.atu)
             startService(intent)
             Log.i("keyLen:", appParameters.keyLengths.toString())
+            }
+            else{
+                tvAuthenticated.text = "Je potřeba si vyžádat klíče"
+            }
+
         }
         else if (KEY_LENGTH == 192 && (sharedPreferences192 != null))
         {
-            tvUserKey.text = sharedPreferences192.getString("userKey", null)
-            tvHatu.text = sharedPreferences192.getString("hatu", null)
-            appParameters.userKey = sharedPreferences192.getString("userKey", null)
-            appParameters.hatu = sharedPreferences192.getString("hatu", null)
-            appParameters.atu =
-                Base64.decode(sharedPreferences192.getString("ATU", null), Base64.DEFAULT)
-            appParameters.keyLengths = sharedPreferences192.getInt("keyLenghts", 0)
-            tvAtu.text = appParameters.keyLengths.toString()
-            intent.putExtra("UserKey", appParameters.userKey)
-            intent.putExtra("Hatu", appParameters.hatu)
-            intent.putExtra("KeyLength", appParameters.keyLengths)
-            intent.putExtra("Atu", appParameters.atu)
-            startService(intent)
-            Log.i("keyLen:", appParameters.keyLengths.toString())
+            if(sharedPreferences192.getString("userKey", null) != null) {
+                tvUserKey.text = sharedPreferences192.getString("userKey", null)
+                tvHatu.text = sharedPreferences192.getString("hatu", null)
+                appParameters.userKey = sharedPreferences192.getString("userKey", null)
+                appParameters.hatu = sharedPreferences192.getString("hatu", null)
+                appParameters.atu =
+                    Base64.decode(sharedPreferences192.getString("ATU", null), Base64.DEFAULT)
+                appParameters.keyLengths = sharedPreferences192.getInt("keyLenghts", 0)
+                tvAtu.text = appParameters.keyLengths.toString()
+                intent.putExtra("UserKey", appParameters.userKey)
+                intent.putExtra("Hatu", appParameters.hatu)
+                intent.putExtra("KeyLength", appParameters.keyLengths)
+                intent.putExtra("Atu", appParameters.atu)
+                startService(intent)
+                Log.i("keyLen:", appParameters.keyLengths.toString())
+            }
+            else{
+                tvAuthenticated.text = "Je potřeba si vyžádat klíče"
+            }
         }
         else if (KEY_LENGTH == 256 && (sharedPreferences256 != null))
         {
-            tvUserKey.text = sharedPreferences256.getString("userKey", null)
-            tvHatu.text = sharedPreferences256.getString("hatu", null)
-            appParameters.userKey = sharedPreferences256.getString("userKey", null)
-            appParameters.hatu = sharedPreferences256.getString("hatu", null)
-            appParameters.atu =
-                Base64.decode(sharedPreferences256.getString("ATU", null), Base64.DEFAULT)
-            appParameters.keyLengths = sharedPreferences256.getInt("keyLenghts", 0)
-            tvAtu.text = appParameters.keyLengths.toString()
-            intent.putExtra("UserKey", appParameters.userKey)
-            intent.putExtra("Hatu", appParameters.hatu)
-            intent.putExtra("KeyLength", appParameters.keyLengths)
-            intent.putExtra("Atu", appParameters.atu)
-            startService(intent)
-            Log.i("keyLen:", appParameters.keyLengths.toString())
+            if(sharedPreferences192.getString("userKey", null) != null) {
+                tvUserKey.text = sharedPreferences256.getString("userKey", null)
+                tvHatu.text = sharedPreferences256.getString("hatu", null)
+                appParameters.userKey = sharedPreferences256.getString("userKey", null)
+                appParameters.hatu = sharedPreferences256.getString("hatu", null)
+                appParameters.atu =
+                    Base64.decode(sharedPreferences256.getString("ATU", null), Base64.DEFAULT)
+                appParameters.keyLengths = sharedPreferences256.getInt("keyLenghts", 0)
+                tvAtu.text = appParameters.keyLengths.toString()
+                intent.putExtra("UserKey", appParameters.userKey)
+                intent.putExtra("Hatu", appParameters.hatu)
+                intent.putExtra("KeyLength", appParameters.keyLengths)
+                intent.putExtra("Atu", appParameters.atu)
+                startService(intent)
+                Log.i("keyLen:", appParameters.keyLengths.toString())
+            }
+            else{
+                tvAuthenticated.text = "Je potřeba si vyžádat klíče"
+            }
         }
         else {
             if(sharedPreferences.getString("userKey", null) != null) {
